@@ -1,0 +1,15 @@
+---
+title: 'why the cross desk has nothing real-time in it'
+date: 2026-09-02
+tag: 'product'
+minutes: 2
+excerpt: 'the cross desk is four ai analysts that hold a morning meeting at 8:00 central over real options data, then publish a desk brief.'
+---
+
+The Cross Desk is four AI analysts that hold a morning meeting at 8:00 central over real options data, then publish a desk brief. Subscribers replay the meeting through the day. Nothing runs intraday. Zero LLM calls between the open and the close, and that was the first real product decision I made on it.
+
+Cost is the obvious reason. Batch generation runs about $0.10 per user per day against a $15 a month subscription, and regenerating on every market move would multiply that by the length of the session.
+
+Licensing is the bigger one. Exchanges treat real-time display of market data and delayed derived commentary as different products with different obligations, which means a brief generated once each morning is something one person can actually license and ship. A live feed of AI commentary racing the tape is not. So I built the version I could ship.
+
+The other thing worth writing down is the Numbers Rule. All the chain math is computed in TypeScript first: gamma exposure, the flip point, walls, expected move, ATR, relative volume. The analysts write from those figures. Then a validator pulls every number back out of the generated text, checks it against the computed value, and regenerates the whole turn on any mismatch. It earned its keep early. It caught an analyst rounding 83.97% to "80%" because the sentence read better. Language models round numbers to make sentences flow, so every figure gets checked before it ships.

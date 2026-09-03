@@ -1,0 +1,17 @@
+---
+title: 'ap2 and x402'
+date: 2026-08-01
+tag: 'protocols'
+minutes: 2
+excerpt: 'two protocols got most of the attention in agentic payments over the last year.'
+---
+
+Two protocols got most of the attention in agentic payments over the last year. They answer different questions. Most of the confusion comes from treating them as competitors.
+
+AP2 is the Agent Payments Protocol, announced by Google in September 2025 with about 60 launch partners and since donated to the FIDO Alliance. Its core idea is the mandate. An intent mandate is a cryptographically signed record of what the user asked for, like "find me running shoes under $120". A cart mandate signs the exact final cart before the purchase executes. When a dispute happens, there is a chain of evidence connecting the charge back to a human decision. AP2 does not care how the money actually moves. Cards, bank transfers, and stablecoins all fit under it, which is what you would expect from a protocol designed with card networks at the table. It exists to make liability answerable.
+
+x402 comes from Coinbase and Cloudflare, and it revives HTTP status code 402, Payment Required. A server answers a request with 402 and a price. The client retries with a signed stablecoin payment in a header, usually USDC on Base or Solana, and gets the response. No account. No API key. It is metering for machines, sized for payments as small as a fraction of a cent. By spring 2026 it had processed around 165 million transactions from roughly 69,000 active agents, and when Stripe shipped support for it in February the protocol stopped being filed under crypto experiments. The honest caveat: measured real-commerce volume is still only tens of thousands of dollars a day. A lot of the current traffic looks speculative.
+
+Put them side by side. The split is clean. AP2 answers "was this purchase authorized, and who eats the loss when it wasn't". x402 answers "how does an agent pay for one HTTP request without a signup flow". A serious agent stack will end up using both, and there is already an A2A extension wiring x402 payments into AP2-style flows.
+
+What neither protocol gives you is the agent-side spend layer. Something still has to enforce the budget, deduplicate the retries, and keep books the user can reconcile against a bank statement. That is double-entry bookkeeping with an idempotency key, and nobody has standardized it yet.

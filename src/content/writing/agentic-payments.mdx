@@ -1,0 +1,17 @@
+---
+title: 'agentic payments'
+date: 2026-08-01
+tag: 'payments'
+minutes: 2
+excerpt: 'ai agents are starting to spend money.'
+---
+
+AI agents are starting to spend money. They book tables, renew subscriptions, buy compute, and pay other agents for API calls. Every payment rail they touch was designed on one assumption: a human is present at the moment of purchase. That assumption just broke.
+
+Start with authorization. Card security is built around proving the cardholder was there. CVV, 3-D Secure, the liability rules behind every chargeback. With an agent the human decision happened earlier, back when the instruction was given. "Book me a flight under $400" is the authorization. The purchase itself happens hours later, against a merchant the user never saw. When it goes wrong, the dispute question changes from "did you click buy" to "did your agent stay inside the instruction you gave it", and card networks have no native way to answer that.
+
+Then the economics. A card transaction carries a fixed fee around 30 cents. Fine for a $60 checkout. Absurd for an agent paying a tenth of a cent per API call. Machine-to-machine spending wants payments the size of a request, settled in seconds, with no signup flow, and that is a different rail entirely.
+
+The part nobody markets is retries. An agent that hits a timeout does what all well-built clients do, it tries again, except this client holds a wallet and can convince itself the first attempt never happened. Payment systems handle this with idempotency keys: the client attaches a unique key to the request, and the server returns the original result on a replay instead of moving money twice. That machinery is table stakes for human-initiated payments. For agent-initiated payments it is the whole game, along with budgets, merchant allowlists, and receipts that reconcile against a real bank statement. None of the new protocols own that layer yet.
+
+Two camps are forming around the rails themselves. Card networks and Google are extending the existing system with signed mandates, so the human's instruction becomes a verifiable artifact a dispute can point at. Coinbase and Cloudflare built a new rail where the payment travels inside the HTTP request itself. [The next writeup covers both](/writing/ap2-x402).
