@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap"><style>body{margin:0;background:#0a0a0b;font-family:Geist,system-ui,sans-serif;transition:background .35s}a{color:inherit}a:hover{opacity:.9}button{font-family:inherit}@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}.th-dark{--bg:#0a0a0b;--fg:#e7e7ea;--fg2:#a1a1a8;--fg3:#6b6b73;--line:#1c1c21;--acc:#e8b04b;--accText:#e8b04b;--dock:rgba(22,22,24,.85);--dockLine:#26262b;--hov:#1c1c21;--card:#0f0f11;--shadow:0 12px 32px rgba(0,0,0,.45)}.th-light{--bg:#faf9f6;--fg:#1a1a1a;--fg2:#5c5c62;--fg3:#8f8f96;--line:#e8e6e0;--acc:#e8b04b;--accText:#8a6100;--dock:rgba(255,255,255,.85);--dockLine:#e8e6e0;--hov:#f0eee8;--card:#ffffff;--shadow:0 12px 32px rgba(0,0,0,.1)}.dk{position:relative;transition:transform .4s cubic-bezier(.34,1.56,.64,1),background .15s!important}.dk:hover{transform:translateY(-7px) scale(1.18)!important}.dk::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 12px);left:50%;transform:translate(-50%,6px) scale(.96);padding:5px 9px;border-radius:6px;background:var(--fg);color:var(--bg);font:500 11px/1 Geist,system-ui,sans-serif;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s,transform .25s cubic-bezier(.2,.7,.2,1)}.dk:hover::after{opacity:1;transform:translate(-50%,0) scale(1)}@keyframes dockIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}</style></helmet>
+<div class="{{ theme.cls }}" data-screen-label="writing" style="min-height:100vh;background:var(--bg);color:var(--fg);transition:background .35s,color .35s;display:flex;flex-direction:column">
+<div style="max-width:680px;width:100%;margin:0 auto;padding:72px 40px 40px;display:flex;flex-direction:column;gap:40px;box-sizing:border-box">
+  <a href="Home.dc.html" style="font-family:'Geist Mono',ui-monospace,monospace;font-size:12.5px;color:var(--fg3);text-decoration:none;align-self:flex-start" style-hover="color:var(--fg)">← shifan</a>
+  <header style="display:flex;flex-direction:column;gap:12px;animation:fadeUp .6s cubic-bezier(.2,.7,.2,1) both">
+    <h1 style="margin:0;font-size:36px;font-weight:600;letter-spacing:-0.03em;line-height:1.05">writing</h1>
+    <p style="margin:0;font-size:16px;color:var(--fg2);line-height:1.5">long-form when something broke and i want to remember why. for the one-liners, see <a href="Learnings.dc.html" style="color:var(--accText);text-decoration:underline;text-underline-offset:4px;text-decoration-color:rgba(232,176,75,.4)">things i've learned</a>.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
+      <sc-for list="{{ tags }}" as="t" hint-placeholder-count="5">
+        <button onClick="{{ t.pick }}" style="all:unset;cursor:pointer;font-family:'Geist Mono',ui-monospace,monospace;font-size:12px;padding:4px 9px;border-radius:6px;border:1px solid {{ t.border }};color:{{ t.color }};transition:border-color .15s,color .15s" style-hover="border-color:var(--acc);color:var(--fg)">{{ t.name }}</button>
+      </sc-for>
+    </div>
+  </header>
+  <section style="display:flex;flex-direction:column;animation:fadeUp .6s .1s cubic-bezier(.2,.7,.2,1) both">
+    <sc-for list="{{ posts }}" as="w" hint-placeholder-count="7">
+      <a href="#" style="display:flex;flex-direction:column;gap:6px;padding:18px 12px;margin:0 -12px;border-radius:10px;text-decoration:none;color:var(--fg);transition:background .15s" style-hover="background:var(--hov)">
+        <div style="display:flex;justify-content:space-between;gap:16px;align-items:baseline"><span style="font-size:18px;font-weight:500;letter-spacing:-0.015em;line-height:1.3">{{ w.title }}</span><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11.5px;color:var(--fg3);white-space:nowrap">{{ w.date }}</span></div>
+        <div style="font-size:14.5px;color:var(--fg2);line-height:1.5">{{ w.excerpt }}</div>
+        <div style="display:flex;gap:12px;font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;color:var(--fg3)"><span style="color:var(--accText)">{{ w.tag }}</span><span>{{ w.mins }} min</span></div>
+      </a>
+    </sc-for>
+  </section>
+</div>
+<nav style="position:sticky;bottom:20px;animation:dockIn .7s .4s cubic-bezier(.2,.7,.2,1) both;align-self:center;margin:24px 0 20px;display:flex;gap:2px;padding:6px;border-radius:12px;background:var(--dock);border:1px solid var(--dockLine);box-shadow:var(--shadow);backdrop-filter:blur(12px)">
+  <a href="Home.dc.html" class="dk" data-tip="home" style="width:38px;height:38px;border-radius:8px;display:grid;place-items:center;color:var(--fg2);text-decoration:none;font-size:13px;font-weight:600" style-hover="background:var(--hov)">/</a>
+  <a href="Writing.dc.html" class="dk" data-tip="writing" style="position:relative;width:38px;height:38px;border-radius:8px;display:grid;place-items:center;color:var(--fg);text-decoration:none" style-hover="background:var(--hov)"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20h4l11-11-4-4L4 16v4z"></path></svg><span style="position:absolute;bottom:3px;width:4px;height:4px;border-radius:50%;background:var(--acc)"></span></a>
+  <a href="Learnings.dc.html" class="dk" data-tip="learnings" style="width:38px;height:38px;border-radius:8px;display:grid;place-items:center;color:var(--fg2);text-decoration:none" style-hover="background:var(--hov)"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18h6"></path><path d="M10 21h4"></path><path d="M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.3 1 2.5h6c0-1.2.4-1.9 1-2.5A6 6 0 0 0 12 3z"></path></svg></a>
+  <a href="Plot.dc.html" class="dk" data-tip="the plot" style="width:38px;height:38px;border-radius:8px;display:grid;place-items:center;color:var(--fg2);text-decoration:none" style-hover="background:var(--hov)"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg></a>
+  <span style="width:1px;background:var(--dockLine);margin:6px 4px"></span>
+  <a href="https://github.com/hirashif" class="dk" data-tip="github" style="width:38px;height:38px;border-radius:8px;display:grid;place-items:center;color:var(--fg2);text-decoration:none" style-hover="background:var(--hov)"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56 0-.27-.01-1.17-.02-2.12-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.75 2.69 1.25 3.34.95.1-.74.4-1.25.72-1.53-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18.92-.26 1.9-.38 2.88-.39.98 0 1.96.13 2.88.39 2.2-1.49 3.16-1.18 3.16-1.18.63 1.59.24 2.76.12 3.05.74.81 1.19 1.83 1.19 3.09 0 4.42-2.7 5.39-5.26 5.68.41.35.78 1.05.78 2.12 0 1.53-.01 2.76-.01 3.14 0 .31.2.68.8.56A10.52 10.52 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"></path></svg></a>
+  <a href="mailto:shifan.hirani@gmail.com" class="dk" data-tip="email" style="width:38px;height:38px;border-radius:8px;display:grid;place-items:center;color:var(--fg2);text-decoration:none" style-hover="background:var(--hov)"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="5" width="19" height="14" rx="2.5"></rect><path d="M3.5 6.5 12 13l8.5-6.5"></path></svg></a>
+  <button onClick="{{ toggleTheme }}" class="dk" data-tip="toggle theme (t)" style="width:38px;height:38px;border-radius:8px;display:grid;place-items:center;color:var(--accText);background:none;border:0;cursor:pointer" style-hover="background:var(--hov)"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" style="display:{{ theme.sun }}"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" style="display:{{ theme.moon }}"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg></button>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  constructor(p) {
+    super(p); let s = null; try { s = localStorage.getItem('shifan-theme'); } catch (e) {}
+    this.state = { theme: s || 'dark', tag: 'all' };
+    this.posts = [
+      ['finding the bug that let a $70 account send $500', 'aug 25', 'ledger', 9, 'two transfers, one balance check, zero locks. how a race in my own double-entry ledger paid out money that didn\'t exist, and the fixed lock order that closed it.'],
+      ['ordering without global order', 'jun 25', 'kafka', 7, 'prices arrive out of order across partitions and that is fine. what you actually need is order per symbol, and why that changes the key you pick.'],
+      ['why the cross desk has nothing real-time in it', 'may 25', 'design', 6, 'four ai analysts, one 8:00 ct meeting, every number rechecked. the case for a daily batch when everyone else is streaming.'],
+      ['agentic payments', 'mar 25', 'payments', 8, 'what changes when the thing holding the card is a model. mandates, limits, and who eats the chargeback.'],
+      ['ap2 and x402', 'feb 25', 'payments', 5, 'two proposals for machines paying machines. a side-by-side on what each one assumes about trust.'],
+      ['concurrency in practice', 'nov 24', 'java', 10, 'the transaction manager, the connection pool, and the three ways spring will deadlock you if you let it.'],
+      ['what inference actually costs', 'sep 24', 'ai', 6, 'a napkin model for tokens-in, tokens-out, and why the bill is never the number on the pricing page.']
+    ].map(p => ({ title: p[0], date: p[1], tag: p[2], mins: p[3], excerpt: p[4] }));
+  }
+  componentDidMount() { this.onKey = e => { if (e.key === 't' && !(e.target && /INPUT|TEXTAREA/.test(e.target.tagName))) this.toggleTheme(); }; window.addEventListener('keydown', this.onKey); this.applyBody(); }
+  componentWillUnmount() { window.removeEventListener('keydown', this.onKey); }
+  applyBody() { document.body.style.background = this.state.theme === 'dark' ? '#0a0a0b' : '#faf9f6'; }
+  toggleTheme = () => this.setState(s => { const th = s.theme === 'dark' ? 'light' : 'dark'; try { localStorage.setItem('shifan-theme', th); } catch (e) {} return { theme: th }; }, () => this.applyBody());
+  renderVals() {
+    const d = this.state.theme === 'dark', st = this.state;
+    const tags = ['all', ...Array.from(new Set(this.posts.map(p => p.tag)))];
+    return {
+      theme: { cls: d ? 'th-dark' : 'th-light', sun: d ? 'block' : 'none', moon: d ? 'none' : 'block' }, toggleTheme: this.toggleTheme,
+      tags: tags.map(t => ({ name: t, color: t === st.tag ? 'var(--fg)' : 'var(--fg3)', border: t === st.tag ? 'var(--acc)' : 'var(--line)', pick: () => this.setState({ tag: t }) })),
+      posts: st.tag === 'all' ? this.posts : this.posts.filter(p => p.tag === st.tag)
+    };
+  }
+}
+</script>
+</body>
+</html>

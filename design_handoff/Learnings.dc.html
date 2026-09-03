@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap"><style>body{margin:0;background:#0a0a0b;font-family:Geist,system-ui,sans-serif;transition:background .35s}a{color:inherit}a:hover{opacity:.9}button{font-family:inherit}@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}.th-dark{--bg:#0a0a0b;--fg:#e7e7ea;--fg2:#a1a1a8;--fg3:#6b6b73;--line:#1c1c21;--acc:#e8b04b;--accText:#e8b04b;--dock:rgba(22,22,24,.85);--dockLine:#26262b;--hov:#1c1c21;--card:#0f0f11;--shadow:0 12px 32px rgba(0,0,0,.45)}.th-light{--bg:#faf9f6;--fg:#1a1a1a;--fg2:#5c5c62;--fg3:#8f8f96;--line:#e8e6e0;--acc:#e8b04b;--accText:#8a6100;--dock:rgba(255,255,255,.85);--dockLine:#e8e6e0;--hov:#f0eee8;--card:#ffffff;--shadow:0 12px 32px rgba(0,0,0,.1)}.dk{position:relative;transition:transform .4s cubic-bezier(.34,1.56,.64,1),background .15s!important}.dk:hover{transform:translateY(-7px) scale(1.18)!important}.dk::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 12px);left:50%;transform:translate(-50%,6px) scale(.96);padding:5px 9px;border-radius:6px;background:var(--fg);color:var(--bg);font:500 11px/1 Geist,system-ui,sans-serif;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s,transform .25s cubic-bezier(.2,.7,.2,1)}.dk:hover::after{opacity:1;transform:translate(-50%,0) scale(1)}@keyframes dockIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}</style></helmet>
+<div class="{{ theme.cls }}" data-screen-label="learnings" style="min-height:100vh;background:var(--bg);color:var(--fg);transition:background .35s,color .35s;display:flex;flex-direction:column">
+<div style="max-width:680px;width:100%;margin:0 auto;padding:72px 40px 40px;display:flex;flex-direction:column;gap:40px;box-sizing:border-box">
+  <a href="Home.dc.html" style="font-family:'Geist Mono',ui-monospace,monospace;font-size:12.5px;color:var(--fg3);text-decoration:none;align-self:flex-start" style-hover="color:var(--fg)">← shifan</a>
+  <header style="display:flex;flex-direction:column;gap:12px;animation:fadeUp .6s cubic-bezier(.2,.7,.2,1) both">
+    <h1 style="margin:0;font-size:36px;font-weight:600;letter-spacing:-0.03em;line-height:1.05">things i've learned</h1>
+    <p style="margin:0;font-size:16px;color:var(--fg2);line-height:1.5">twenty-five. one line each. when i learn a new one, an old one has to go.</p>
+  </header>
+  <ol style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;animation:fadeUp .6s .1s cubic-bezier(.2,.7,.2,1) both">
+    <sc-for list="{{ items }}" as="l" hint-placeholder-count="25">
+      <li style="display:grid;grid-template-columns:36px 1fr;gap:14px;align-items:baseline;padding:13px 0;border-top:1px solid var(--line)"><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:12px;color:var(--accText)">{{ l.n }}</span><span style="font-size:16px;line-height:1.5">{{ l.text }}</span></li>
+    </sc-for>
+  </ol>
+</div>
+<nav style="position:sticky;bottom:20px;animation:dockIn .7s .4s cubic-bezier(.2,.7,.2,1) both;align-self:center;margin:24px 0 20px;display:flex;gap:2px;padding:6px;border-radius:12px;background:var(--dock);border:1px solid var(--dockLine);box-shadow:var(--shadow);backdrop-filter:blur(12px)">
+  <a href="Home.dc.html" class="dk" data-tip="home" style="width:38px;height:38px;border-radius:8px;display:grid;place-items:center;color:var(--fg2);text-decoration:none;font-size:13px;font-weight:600" style-hover="background:var(--hov)">/</a>
+  <a href="Writing.dc.html" class="dk" data-tip="writing" style="width:38px;height:38px;border-radius:8px;display:grid;place-items:center;color:var(--fg2);text-decoration:none" style-hover="background:var(--hov)"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20h4l11-11-4-4L4 16v4z"></path></svg></a>
+  <a href="Learnings.dc.html" class="dk" data-tip="learnings" style="position:relative;width:38px;height:38px;border-radius:8px;display:grid;place-items:center;color:var(--fg);text-decoration:none" style-hover="background:var(--hov)"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18h6"></path><path d="M10 21h4"></path><path d="M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.3 1 2.5h6c0-1.2.4-1.9 1-2.5A6 6 0 0 0 12 3z"></path></svg><span style="position:absolute;bottom:3px;width:4px;height:4px;border-radius:50%;background:var(--acc)"></span></a>
+  <a href="Plot.dc.html" class="dk" data-tip="the plot" style="width:38px;height:38px;border-radius:8px;display:grid;place-items:center;color:var(--fg2);text-decoration:none" style-hover="background:var(--hov)"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg></a>
+  <span style="width:1px;background:var(--dockLine);margin:6px 4px"></span>
+  <a href="https://github.com/hirashif" class="dk" data-tip="github" style="width:38px;height:38px;border-radius:8px;display:grid;place-items:center;color:var(--fg2);text-decoration:none" style-hover="background:var(--hov)"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56 0-.27-.01-1.17-.02-2.12-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.75 2.69 1.25 3.34.95.1-.74.4-1.25.72-1.53-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18.92-.26 1.9-.38 2.88-.39.98 0 1.96.13 2.88.39 2.2-1.49 3.16-1.18 3.16-1.18.63 1.59.24 2.76.12 3.05.74.81 1.19 1.83 1.19 3.09 0 4.42-2.7 5.39-5.26 5.68.41.35.78 1.05.78 2.12 0 1.53-.01 2.76-.01 3.14 0 .31.2.68.8.56A10.52 10.52 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"></path></svg></a>
+  <a href="mailto:shifan.hirani@gmail.com" class="dk" data-tip="email" style="width:38px;height:38px;border-radius:8px;display:grid;place-items:center;color:var(--fg2);text-decoration:none" style-hover="background:var(--hov)"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="5" width="19" height="14" rx="2.5"></rect><path d="M3.5 6.5 12 13l8.5-6.5"></path></svg></a>
+  <button onClick="{{ toggleTheme }}" class="dk" data-tip="toggle theme (t)" style="width:38px;height:38px;border-radius:8px;display:grid;place-items:center;color:var(--accText);background:none;border:0;cursor:pointer" style-hover="background:var(--hov)"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" style="display:{{ theme.sun }}"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" style="display:{{ theme.moon }}"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg></button>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  constructor(p) {
+    super(p); let s = null; try { s = localStorage.getItem('shifan-theme'); } catch (e) {}
+    this.state = { theme: s || 'dark' };
+    this.items = [
+      'idempotency keys are cheaper than apologies.',
+      'call your mom. the meeting can wait.',
+      'the boring design is only boring until it\'s wrong.',
+      'nobody remembers what you said in the meeting. they remember if you were late.',
+      'sleep is a performance optimization.',
+      'write it down before the fix. the fix changes what you remember.',
+      'you can\'t outwork a bad night\'s sleep or a bad manager.',
+      'every yes is a debit somewhere.',
+      'read the source. the docs are someone\'s memory of the source.',
+      'the gym is cheaper than therapy and worse at it. do both.',
+      'if the demo needs a caveat, the demo isn\'t ready.',
+      'most meetings are a cache miss.',
+      'say the number out loud. if it sounds wrong, it is.',
+      'the second system is always slower. build the third one first.',
+      'text back. even if it\'s just "saw this."',
+      'a retry without a budget is an outage with extra steps.',
+      'cook for people. it\'s the cheapest way to be liked.',
+      'quit the thing before it quits you, but only after it taught you.',
+      'nobody is thinking about you as much as you think they are. this is good news.',
+      'buy the good chair.',
+      'ask "what would make this wrong?" before "what would make this fast?"',
+      'walk without headphones once a week.',
+      'the ~7,000-person company doesn\'t care how clever the join was.',
+      'you will not remember the thing you\'re anxious about in a year. you will remember who showed up.',
+      'this list is capped at 25 on purpose.'
+    ].map((t, i) => ({ n: String(i + 1).padStart(2, '0'), text: t }));
+  }
+  componentDidMount() { this.onKey = e => { if (e.key === 't') this.toggleTheme(); }; window.addEventListener('keydown', this.onKey); this.applyBody(); }
+  componentWillUnmount() { window.removeEventListener('keydown', this.onKey); }
+  applyBody() { document.body.style.background = this.state.theme === 'dark' ? '#0a0a0b' : '#faf9f6'; }
+  toggleTheme = () => this.setState(s => { const th = s.theme === 'dark' ? 'light' : 'dark'; try { localStorage.setItem('shifan-theme', th); } catch (e) {} return { theme: th }; }, () => this.applyBody());
+  renderVals() {
+    const d = this.state.theme === 'dark';
+    return { theme: { cls: d ? 'th-dark' : 'th-light', sun: d ? 'block' : 'none', moon: d ? 'none' : 'block' }, toggleTheme: this.toggleTheme, items: this.items };
+  }
+}
+</script>
+</body>
+</html>

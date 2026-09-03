@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap"><style>body{margin:0;background:#0a0a0b;font-family:Geist,system-ui,sans-serif;transition:background .35s}a{color:inherit}a:hover{opacity:.9}button,input{font-family:inherit}@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}@keyframes pop{from{opacity:0;transform:translateY(-4px) scale(.98)}to{opacity:1;transform:none}}.th-dark{--bg:#0a0a0b;--fg:#e7e7ea;--fg2:#a1a1a8;--fg3:#6b6b73;--line:#1c1c21;--acc:#e8b04b;--accText:#e8b04b;--dock:rgba(22,22,24,.85);--dockLine:#26262b;--hov:#1c1c21;--card:#0f0f11;--shadow:0 12px 32px rgba(0,0,0,.45)}.th-light{--bg:#faf9f6;--fg:#1a1a1a;--fg2:#5c5c62;--fg3:#8f8f96;--line:#e8e6e0;--acc:#e8b04b;--accText:#8a6100;--dock:rgba(255,255,255,.85);--dockLine:#e8e6e0;--hov:#f0eee8;--card:#ffffff;--shadow:0 12px 32px rgba(0,0,0,.1)}.dk{position:relative;transition:transform .4s cubic-bezier(.34,1.56,.64,1),background .15s!important}.dk:hover{transform:translateY(-7px) scale(1.18)!important}.dk::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 12px);left:50%;transform:translate(-50%,6px) scale(.96);padding:5px 9px;border-radius:6px;background:var(--fg);color:var(--bg);font:500 11px/1 Geist,system-ui,sans-serif;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s,transform .25s cubic-bezier(.2,.7,.2,1)}.dk:hover::after{opacity:1;transform:translate(-50%,0) scale(1)}@keyframes dockIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}</style></helmet>
+<div class="{{ theme.cls }}" data-screen-label="plot" style="min-height:100vh;background:var(--bg);color:var(--fg);transition:background .35s,color .35s;display:flex;flex-direction:column">
+<div style="max-width:680px;width:100%;margin:0 auto;padding:72px 40px 40px;display:flex;flex-direction:column;gap:32px;box-sizing:border-box">
+  <a href="Home.dc.html" style="font-family:'Geist Mono',ui-monospace,monospace;font-size:12.5px;color:var(--fg3);text-decoration:none;align-self:flex-start" style-hover="color:var(--fg)">← shifan</a>
+  <header style="display:flex;flex-direction:column;gap:12px;animation:fadeUp .6s cubic-bezier(.2,.7,.2,1) both">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px"><h1 style="margin:0;font-size:36px;font-weight:600;letter-spacing:-0.03em;line-height:1.05">the plot</h1><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:12px;color:var(--fg3)">{{ claimedCount }} / {{ cellTotal }}</span></div>
+    <p style="margin:0;font-size:16px;color:var(--fg2);line-height:1.5">one pixel per visitor. pick a color, leave a line, hover to read the others. when it fills up, it's done.</p>
+  </header>
+  <div style="position:relative;display:flex;flex-direction:column;gap:10px;animation:fadeUp .6s .1s cubic-bezier(.2,.7,.2,1) both">
+    <div onMouseLeave="{{ cellLeave }}" style="display:grid;grid-template-columns:repeat(40,1fr);gap:2px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--card)">
+      <sc-for list="{{ cells }}" as="c" hint-placeholder-count="40">
+        <button onMouseEnter="{{ c.enter }}" onClick="{{ c.click }}" style="all:unset;aspect-ratio:1;border-radius:2px;background:{{ c.bg }};cursor:{{ c.cursor }};transform:scale({{ c.scale }});transition:transform .12s,background .2s;box-sizing:border-box;outline:{{ c.outline }}"></button>
+      </sc-for>
+    </div>
+    <sc-if value="{{ tipOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;left:{{ tipX }}px;top:{{ tipY }}px;transform:translate(-50%,-100%);z-index:5;pointer-events:none;width:max-content;max-width:260px;padding:9px 12px;border-radius:8px;background:var(--fg);color:var(--bg);box-shadow:var(--shadow);animation:pop .14s ease-out both">
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;line-height:1.4"><span style="width:9px;height:9px;border-radius:2px;background:{{ tipColor }};flex:none"></span><span>{{ tipMsg }}</span></div>
+        <div style="font-family:'Geist Mono',ui-monospace,monospace;font-size:10.5px;opacity:.6;margin-top:3px">{{ tipName }} · {{ tipDate }} · {{ tipCoord }}</div>
+      </div>
+    </sc-if>
+  </div>
+  <sc-if value="{{ hasClaimed }}" hint-placeholder-val="{{ false }}">
+    <div style="font-size:13px;color:var(--fg3);font-family:'Geist Mono',ui-monospace,monospace">yours is at <span style="color:var(--accText)">{{ myCoord }}</span>. it stays.</div>
+  </sc-if>
+  <sc-if value="{{ claiming }}" hint-placeholder-val="{{ false }}">
+    <div style="display:grid;grid-template-columns:auto 1fr 1fr auto;gap:8px;align-items:center;padding:12px 14px;border:1px dashed var(--dockLine);border-radius:10px;animation:pop .18s ease-out both">
+      <div style="display:flex;gap:5px">
+        <sc-for list="{{ swatches }}" as="s" hint-placeholder-count="6">
+          <button onClick="{{ s.pick }}" style="all:unset;cursor:pointer;width:18px;height:18px;border-radius:4px;background:{{ s.hex }};outline:{{ s.outline }};outline-offset:2px;transition:transform .12s" style-hover="transform:scale(1.15)"></button>
+        </sc-for>
+      </div>
+      <input value="{{ formName }}" onChange="{{ setName }}" placeholder="name" style="all:unset;box-sizing:border-box;width:100%;padding:7px 10px;border-radius:8px;background:var(--hov);color:var(--fg);font-size:13.5px">
+      <input value="{{ formMsg }}" onChange="{{ setMsg }}" placeholder="one line" style="all:unset;box-sizing:border-box;width:100%;padding:7px 10px;border-radius:8px;background:var(--hov);color:var(--fg);font-size:13.5px">
+      <div style="display:flex;gap:6px">
+        <button onClick="{{ claim }}" style="border:0;cursor:pointer;padding:7px 12px;border-radius:8px;background:var(--acc);color:#1a1a1a;font-size:13px;font-weight:600;transition:transform .15s" style-hover="transform:translateY(-1px)">claim {{ pendingCoord }}</button>
+        <button onClick="{{ cancelClaim }}" style="border:1px solid var(--dockLine);cursor:pointer;padding:7px 10px;border-radius:8px;background:none;color:var(--fg2);font-size:13px" style-hover="color:var(--fg)">×</button>
+      </div>
+    </div>
+  </sc-if>
+  <section style="display:flex;flex-direction:column;animation:fadeUp .6s .2s cubic-bezier(.2,.7,.2,1) both">
+    <div style="font-size:13px;font-weight:500;color:var(--fg3);padding-bottom:8px">recent</div>
+    <sc-for list="{{ recent }}" as="e" hint-placeholder-count="8">
+      <div onMouseEnter="{{ e.enter }}" style="display:grid;grid-template-columns:14px 44px 1fr auto;gap:12px;align-items:baseline;padding:11px 0;border-top:1px solid var(--line);cursor:default"><span style="width:9px;height:9px;border-radius:2px;background:{{ e.color }};align-self:center"></span><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11.5px;color:var(--accText)">{{ e.coord }}</span><span style="font-size:14.5px;line-height:1.45">{{ e.msg }}</span><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;color:var(--fg3)">{{ e.name }} · {{ e.date }}</span></div>
+    </sc-for>
+  </section>
+  <div style="font-size:12px;color:var(--fg3)">click an empty cell to claim it. one pixel, one person — behind github sign-in on the live site.</div>
+</div>
+<nav style="position:sticky;bottom:20px;animation:dockIn .7s .4s cubic-bezier(.2,.7,.2,1) both;align-self:center;margin:24px 0 20px;display:flex;gap:2px;padding:6px;border-radius:12px;background:var(--dock);border:1px solid var(--dockLine);box-shadow:var(--shadow);backdrop-filter:blur(12px)">
+  <a href="Home.dc.html" class="dk" data-tip="home" style="width:38px;height:38px;border-radius:8px;display:grid;place-items:center;color:var(--fg2);text-decoration:none;font-size:13px;font-weight:600" style-hover="background:var(--hov)">/</a>
+  <a href="Writing.dc.html" class="dk" data-tip="writing" style="width:38px;height:38px;border-radius:8px;display:grid;place-items:center;color:var(--fg2);text-decoration:none" style-hover="background:var(--hov)"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20h4l11-11-4-4L4 16v4z"></path></svg></a>
+  <a href="Learnings.dc.html" class="dk" data-tip="learnings" style="width:38px;height:38px;border-radius:8px;display:grid;place-items:center;color:var(--fg2);text-decoration:none" style-hover="background:var(--hov)"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18h6"></path><path d="M10 21h4"></path><path d="M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.3 1 2.5h6c0-1.2.4-1.9 1-2.5A6 6 0 0 0 12 3z"></path></svg></a>
+  <a href="Plot.dc.html" class="dk" data-tip="the plot" style="position:relative;width:38px;height:38px;border-radius:8px;display:grid;place-items:center;color:var(--fg);text-decoration:none" style-hover="background:var(--hov)"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg><span style="position:absolute;bottom:3px;width:4px;height:4px;border-radius:50%;background:var(--acc)"></span></a>
+  <span style="width:1px;background:var(--dockLine);margin:6px 4px"></span>
+  <a href="https://github.com/hirashif" class="dk" data-tip="github" style="width:38px;height:38px;border-radius:8px;display:grid;place-items:center;color:var(--fg2);text-decoration:none" style-hover="background:var(--hov)"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56 0-.27-.01-1.17-.02-2.12-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.75 2.69 1.25 3.34.95.1-.74.4-1.25.72-1.53-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18.92-.26 1.9-.38 2.88-.39.98 0 1.96.13 2.88.39 2.2-1.49 3.16-1.18 3.16-1.18.63 1.59.24 2.76.12 3.05.74.81 1.19 1.83 1.19 3.09 0 4.42-2.7 5.39-5.26 5.68.41.35.78 1.05.78 2.12 0 1.53-.01 2.76-.01 3.14 0 .31.2.68.8.56A10.52 10.52 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"></path></svg></a>
+  <a href="mailto:shifan.hirani@gmail.com" class="dk" data-tip="email" style="width:38px;height:38px;border-radius:8px;display:grid;place-items:center;color:var(--fg2);text-decoration:none" style-hover="background:var(--hov)"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="5" width="19" height="14" rx="2.5"></rect><path d="M3.5 6.5 12 13l8.5-6.5"></path></svg></a>
+  <button onClick="{{ toggleTheme }}" class="dk" data-tip="toggle theme (t)" style="width:38px;height:38px;border-radius:8px;display:grid;place-items:center;color:var(--accText);background:none;border:0;cursor:pointer" style-hover="background:var(--hov)"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" style="display:{{ theme.sun }}"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" style="display:{{ theme.moon }}"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg></button>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  constructor(p) {
+    super(p); let s = null, saved = null;
+    try { s = localStorage.getItem('shifan-theme'); saved = JSON.parse(localStorage.getItem('shifan-guestbook') || 'null'); } catch (e) {}
+    this.COLS = 40; this.ROWS = 10;
+    this.palette = ['#e8b04b', '#53d08a', '#7dd3fc', '#f472b6', '#a78bfa', '#fb923c'];
+    this.state = { theme: s || 'dark', hover: -1, tipX: 0, tipY: 0, pending: -1, color: 0, formName: '', formMsg: '', plot: saved || this.seedPlot() };
+  }
+  seedPlot() {
+    const pal = this.palette;
+    const seeds = [
+      ['amrit', 'this is very clean. stole the dock idea back', 'sep 2'], ['a paycom coworker', 'still owe you for the tax engine bug', 'aug 28'],
+      ['someone from hn', 'came for the $70 → $500 writeup. stayed.', 'aug 21'], ['mira', 'idempotency keys > apologies. framing that.', 'aug 19'],
+      ['dev', 'hire this man', 'aug 14'], ['jules', 'the uptime counter is unhinged, love it', 'aug 12'],
+      ['tom', 'was here.', 'aug 9'], ['k.', 'read all seven writeups on a flight', 'aug 3'],
+      ['ana', 'kafka partition post saved my sprint', 'jul 30'], ['r', 'pressed t. nice.', 'jul 28'],
+      ['lee', 'ledger repo is a masterclass in boring', 'jul 22'], ['sam', 'claimed a pixel. no notes.', 'jul 19'],
+      ['nadia', 'the cross desk sounds like my dream job', 'jul 15'], ['pat', 'first!', 'jul 11'],
+      ['zo', 'came from linkedin, staying for the git log', 'jul 8'], ['b', 'good luck with the desk', 'jul 1'],
+      ['h', '👀', 'jun 27'], ['casey', 'that $500 bug haunts me too', 'jun 20'],
+      ['iv', 'terminal remnant > full terminal', 'jun 14'], ['q', 'ok the name tooltip got me', 'jun 9'],
+      ['omar', 'shifā. fitting.', 'jun 2'], ['dee', 'boring designs forever', 'may 28'],
+      ['x', '.', 'may 21'], ['ren', 'the plot is a nice touch', 'may 15']
+    ];
+    let r = 11; const rnd = () => (r = (r * 1664525 + 1013904223) % 4294967296) / 4294967296;
+    const plot = {};
+    seeds.forEach((e, n) => { let i; do { i = Math.floor(rnd() * 400); } while (plot[i]); plot[i] = { name: e[0], msg: e[1], date: e[2], color: pal[Math.floor(rnd() * pal.length)], order: seeds.length - n }; });
+    return plot;
+  }
+  coord(i) { return String.fromCharCode(97 + Math.floor(i / this.COLS)) + (i % this.COLS + 1); }
+  componentDidMount() {
+    this.onKey = e => { if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return; if (e.key === 't') this.toggleTheme(); };
+    window.addEventListener('keydown', this.onKey); this.applyBody();
+  }
+  componentWillUnmount() { window.removeEventListener('keydown', this.onKey); }
+  applyBody() { document.body.style.background = this.state.theme === 'dark' ? '#0a0a0b' : '#faf9f6'; }
+  toggleTheme = () => this.setState(s => { const th = s.theme === 'dark' ? 'light' : 'dark'; try { localStorage.setItem('shifan-theme', th); } catch (e) {} return { theme: th }; }, () => this.applyBody());
+  cellEnter(i, e) {
+    if (!this.state.plot[i]) { if (this.state.hover !== -1) this.setState({ hover: -1 }); return; }
+    const grid = e.currentTarget.parentElement, wrap = grid.parentElement, r = e.currentTarget.getBoundingClientRect(), w = wrap.getBoundingClientRect();
+    const x = r.left - w.left + r.width / 2;
+    this.setState({ hover: i, tipX: Math.max(130, Math.min(w.width - 130, x)), tipY: r.top - w.top - 8 });
+  }
+  cellClick(i) { if (this.state.plot[i] || this.myIndex() >= 0) return; this.setState({ pending: i }); }
+  myIndex() { const p = this.state.plot; for (const k in p) if (p[k].mine) return +k; return -1; }
+  claim = () => {
+    const i = this.state.pending; if (i < 0) return;
+    const date = new Date().toLocaleString('en-US', { month: 'short', day: 'numeric' }).toLowerCase();
+    this.setState(s => {
+      const plot = { ...s.plot, [i]: { name: (s.formName || 'anonymous').toLowerCase(), msg: s.formMsg || 'was here.', date, color: this.palette[s.color], mine: true, order: 999 } };
+      try { localStorage.setItem('shifan-guestbook', JSON.stringify(plot)); } catch (e) {}
+      return { plot, pending: -1, formName: '', formMsg: '' };
+    });
+  };
+  renderVals() {
+    const d = this.state.theme === 'dark', st = this.state, h = st.plot[st.hover];
+    const recent = Object.keys(st.plot).map(k => ({ i: +k, ...st.plot[k] })).sort((a, b) => (b.order || 0) - (a.order || 0)).slice(0, 8);
+    return {
+      theme: { cls: d ? 'th-dark' : 'th-light', sun: d ? 'block' : 'none', moon: d ? 'none' : 'block' }, toggleTheme: this.toggleTheme,
+      cells: Array.from({ length: this.COLS * this.ROWS }, (_, i) => {
+        const c = st.plot[i], empty = d ? '#17171b' : '#ecebe6', hot = i === st.hover || i === st.pending;
+        return { bg: c ? c.color : empty, cursor: c ? 'help' : 'pointer', scale: hot ? 1.35 : 1, outline: i === st.pending ? '2px solid var(--fg)' : 'none', enter: e => this.cellEnter(i, e), click: () => this.cellClick(i) };
+      }),
+      cellLeave: () => this.setState({ hover: -1 }), cellTotal: this.COLS * this.ROWS, claimedCount: Object.keys(st.plot).length,
+      tipOpen: !!h, tipX: st.tipX, tipY: st.tipY, tipMsg: h ? h.msg : '', tipName: h ? h.name : '', tipDate: h ? h.date : '', tipColor: h ? h.color : '', tipCoord: h ? this.coord(st.hover) : '',
+      hasClaimed: this.myIndex() >= 0, myCoord: this.myIndex() >= 0 ? this.coord(this.myIndex()) : '',
+      claiming: st.pending >= 0, pendingCoord: st.pending >= 0 ? this.coord(st.pending) : '', claim: this.claim, cancelClaim: () => this.setState({ pending: -1 }),
+      swatches: this.palette.map((hex, i) => ({ hex, outline: i === st.color ? '2px solid var(--fg)' : 'none', pick: () => this.setState({ color: i }) })),
+      formName: st.formName, formMsg: st.formMsg, setName: e => this.setState({ formName: e.target.value }), setMsg: e => this.setState({ formMsg: e.target.value }),
+      recent: recent.map(e => ({ ...e, coord: this.coord(e.i), enter: () => this.setState({ hover: -1 }) }))
+    };
+  }
+}
+</script>
+</body>
+</html>
