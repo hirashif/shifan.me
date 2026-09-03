@@ -6,17 +6,17 @@ minutes: 2
 excerpt: 'crypto-market-pipeline is three go services: an ingester pulling exchange prices, a processor, and a rest api, connected by kafka with redis as the hot store.'
 ---
 
-crypto-market-pipeline is three Go services: an ingester pulling exchange prices, a processor, and a REST API, connected by Kafka with Redis as the hot store. I built it in two days to close the cloud gap on my resume, then spent longer getting it to behave on a real Azure AKS cluster than I spent writing it.
+crypto-market-pipeline is three go services: an ingester pulling exchange prices, a processor, and a rest api, connected by kafka with redis as the hot store. i built it in two days to close the cloud gap on my resume, then spent longer getting it to behave on a real azure aks cluster than i spent writing it.
 
-The decision that shaped everything else is the partitioning. Prices are partitioned by symbol, so BTC-USD lands on one partition and ETH-USD on another. Kafka guarantees order within a partition, which means every consumer sees each symbol's ticks in sequence. That is the only ordering a price feed needs, so it is the only ordering I kept. Global order across symbols is gone, and I gave it up on purpose, because nothing downstream ever compares a BTC tick to an ETH tick by arrival time.
+the decision that shaped everything else is the partitioning. prices are partitioned by symbol, so btc-usd lands on one partition and eth-usd on another. kafka guarantees order within a partition, which means every consumer sees each symbol's ticks in sequence. that is the only ordering a price feed needs, so it is the only ordering i kept. global order across symbols is gone, and i gave it up on purpose, because nothing downstream ever compares a btc tick to an eth tick by arrival time.
 
-Delivery is at-least-once. When the processor restarts mid-batch, some messages come around again. Instead of chasing exactly-once semantics, the Redis write is an idempotent `HSET` keyed on symbol. Applying the same tick twice leaves the same state. History can hold duplicates, which is a tradeoff I accepted and wrote down, with dedupe on sequence id as the fix if it ever matters.
+delivery is at-least-once. when the processor restarts mid-batch, some messages come around again. instead of chasing exactly-once semantics, the redis write is an idempotent `HSET` keyed on symbol. applying the same tick twice leaves the same state. history can hold duplicates, which is a tradeoff i accepted and wrote down, with dedupe on sequence id as the fix if it ever matters.
 
-What broke, in the order it broke:
+what broke, in the order it broke:
 
-- The first VM size I picked could not schedule the pods. Kubernetes reserves a chunk of each node for itself, which I knew as a fact and not as a bill until then.
-- My images were arm64, because I built them on an M-series Mac. The AKS nodes are amd64. Everything built and pushed cleanly. Then it crash-looped in the cluster.
-- Rolling restarts dropped in-flight messages. The processor died on SIGTERM without draining, so deploys quietly ate data. It now stops consuming on the signal, finishes its batch, commits, and exits.
-- During an exchange outage my reconnect loop hammered their API at full speed. Backoff with jitter went in the same night.
+- the first vm size i picked could not schedule the pods. kubernetes reserves a chunk of each node for itself, which i knew as a fact and not as a bill until then.
+- my images were arm64, because i built them on an m-series mac. the aks nodes are amd64. everything built and pushed cleanly. then it crash-looped in the cluster.
+- rolling restarts dropped in-flight messages. the processor died on sigterm without draining, so deploys quietly ate data. it now stops consuming on the signal, finishes its batch, commits, and exits.
+- during an exchange outage my reconnect loop hammered their api at full speed. backoff with jitter went in the same night.
 
-The repo has the Terraform, the GitHub Actions pipeline, and a README that covers most of this.
+[the repo](https://github.com/hirashif/crypto-market-pipeline) has the terraform, the github actions pipeline, and a readme that covers most of this.

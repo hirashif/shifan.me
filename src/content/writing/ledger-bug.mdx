@@ -6,12 +6,12 @@ minutes: 2
 excerpt: 'the ledger is a weekend project.'
 ---
 
-The ledger is a weekend project. Double-entry bookkeeping on Postgres, a transfers API in Spring Boot, and a reconciliation endpoint that proves every balance nets to zero. I built it because I kept talking about payment systems in interviews and wanted to have actually written one.
+the ledger is a weekend project. double-entry bookkeeping on postgres, a transfers api in spring boot, and a reconciliation endpoint that proves every balance nets to zero. i built it because i kept talking about payment systems in interviews and wanted to have actually written one.
 
-The design is deliberately boring. Every transfer writes two rows inside one transaction, a debit and a credit. Both account rows get locked with `SELECT FOR UPDATE` in a fixed order so two concurrent transfers can never deadlock each other. The idempotency key is claimed before any business rule runs. Retry the same request and you get the original transaction back. Reuse the key with a different body and you get a 409, since that means the caller has a bug and a quiet 422 would hide it.
+the design is deliberately boring. every transfer writes two rows inside one transaction, a debit and a credit. both account rows get locked with `SELECT FOR UPDATE` in a fixed order so two concurrent transfers can never deadlock each other. the idempotency key is claimed before any business rule runs. retry the same request and you get the original transaction back. reuse the key with a different body and you get a 409, since that means the caller has a bug and a quiet 422 would hide it.
 
-Then I found the bug. I was seeding demo data with curl and typoed an amount. An account holding $70 sent $500. The API said 201.
+then i found the bug. i was seeding demo data with curl and typoed an amount. an account holding $70 sent $500. the api said 201.
 
-The solvency check existed. It had tests. They passed. The controller was calling a write method that skipped every check, so the guards were dead code on the real path. The tests never noticed, because they called the service layer directly, the one place the checks ran. The fix was small. The bigger change was to the tests, which now go through the HTTP endpoint the way a client would.
+the solvency check existed. it had tests. they passed. the controller was calling a write method that skipped every check, so the guards were dead code on the real path. the tests never noticed, because they called the service layer directly, the one place the checks ran. the fix was small. the bigger change was to the tests, which now go through the http endpoint the way a client would.
 
-It runs live on Cloud Run against a free Neon Postgres, scale-to-zero. Cold start is about 3.3 seconds while the JVM wakes up from zero, warm requests come back in under 200ms, and the whole thing costs nothing to host. Seed data is loaded. You can replay the idempotency demo from the [Swagger page](https://ledger-75986543116.us-central1.run.app/swagger-ui/index.html) and watch the same transactionId come back twice.
+it runs live on cloud run against a free neon postgres, scale-to-zero. cold start is about 3.3 seconds while the jvm wakes up from zero, warm requests come back in under 200ms, and the whole thing costs nothing to host. seed data is loaded. you can replay the idempotency demo from the [swagger page](https://ledger-75986543116.us-central1.run.app/swagger-ui/index.html) and watch the same transactionid come back twice.
