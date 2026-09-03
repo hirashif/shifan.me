@@ -21,7 +21,7 @@ function fmtDate(d: Date): string {
     </p>
     <div class="chips">
       {tags.map((tag, i) => (
-        <button type="button" data-tag={tag} class="mono chip" aria-selected={i === 0 ? 'true' : 'false'}>
+        <button type="button" data-tag={tag} class="mono chip" aria-pressed={i === 0 ? 'true' : 'false'}>
           {tag}
         </button>
       ))}
@@ -52,7 +52,7 @@ function fmtDate(d: Date): string {
   function select(tag: string) {
     chips.forEach((chip) => {
       const active = chip.dataset.tag === tag;
-      chip.setAttribute('aria-selected', active ? 'true' : 'false');
+      chip.setAttribute('aria-pressed', active ? 'true' : 'false');
     });
     rows.forEach((row) => {
       const show = tag === 'all' || row.dataset.postTag === tag;
@@ -127,7 +127,7 @@ function fmtDate(d: Date): string {
     border-color: var(--acc);
     color: var(--fg);
   }
-  .chip[aria-selected='true'] {
+  .chip[aria-pressed='true'] {
     border-color: var(--acc);
     color: var(--fg);
   }
