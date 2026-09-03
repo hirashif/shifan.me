@@ -11,7 +11,7 @@
     "build": "astro build",
     "preview": "wrangler dev",
     "deploy": "astro build && wrangler deploy",
-    "typecheck": "astro check && tsc --noEmit",
+    "typecheck": "wrangler types && astro check && tsc --noEmit",
     "test": "playwright test",
     "usage:push": "tsx scripts/push-usage.ts",
     "astro": "astro"
