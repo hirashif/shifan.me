@@ -1,4 +1,312 @@
 ---
 import Base from '../layouts/Base.astro';
+import Name from '../components/Name.astro';
+import Uptime from '../components/Uptime.astro';
+import Timeline from '../components/Timeline.astro';
+import Stack from '../components/Stack.astro';
+import { learnings } from '../content/learnings';
+import { projects } from '../content/projects';
+import { getCollection } from 'astro:content';
+
+const learnedPreview = learnings.slice(0, 3);
+
+function fmtDate(d: Date): string {
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }).toLowerCase();
+}
+
+const posts = (await getCollection('writing'))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 7);
 ---
-<Base title="shifan" pad="home"><h1>shifan</h1></Base>
+<Base title="shifan" pad="home">
+  <header class="fade-up" style="animation-delay:0ms">
+    <div class="name-col">
+      <Name />
+      <p class="tagline">backend. money and market data.</p>
+    </div>
+    <Uptime />
+  </header>
+
+  <section id="work" class="fade-up" style="animation-delay:80ms">
+    <div class="section-label">work</div>
+    <Timeline />
+  </section>
+
+  <section id="learned" class="fade-up" style="animation-delay:140ms">
+    <p class="learned-lead">
+      a few <a href="/learnings" class="learned-link">things i've learned</a> so far, mostly the hard way.
+    </p>
+    <ul class="learned-list">
+      {learnedPreview.map((l) => (
+        <li class="learned-item">
+          <span class="learned-arrow mono">→</span>
+          <span>{l}</span>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section id="writing" class="fade-up" style="animation-delay:200ms">
+    <div class="row-head">
+      <span class="section-label">writing</span>
+      <a href="/writing" class="all-link">all →</a>
+    </div>
+    {posts.map((post) => (
+      <a href={`/writing/${post.id}`} class="writing-row">
+        <span>{post.data.title}</span>
+        <span class="writing-date mono">{fmtDate(post.data.date)}</span>
+      </a>
+    ))}
+  </section>
+
+  <section id="projects" class="fade-up" style="animation-delay:260ms">
+    <div class="section-label" style="padding-bottom:8px">projects</div>
+    <div class="project-grid">
+      {projects.map((p) => {
+        const inner = (
+          <>
+            <div class="project-head">
+              <span class="project-name">{p.name}</span>
+              <span class="project-badge mono">{p.badge}</span>
+            </div>
+            <span class="project-desc">{p.desc}</span>
+          </>
+        );
+        return p.href ? (
+          <a href={p.href} class="project-card" target="_blank" rel="noopener">{inner}</a>
+        ) : (
+          <div class="project-card">{inner}</div>
+        );
+      })}
+    </div>
+  </section>
+
+  <section id="plot" class="fade-up" style="animation-delay:320ms">
+    <div class="row-head">
+      <span class="section-label">the plot</span>
+      <span class="plot-count mono" data-plot-count>– / 400 pixels claimed</span>
+    </div>
+    <p class="plot-sub">everyone who visits gets one pixel. pick a color, leave a line, hover to read the others.</p>
+    <!-- Task 10 mounts the interactive pixel grid + claim bar here. -->
+    <div data-plot-grid-mount></div>
+  </section>
+
+  <section id="stack" class="fade-up" style="animation-delay:380ms">
+    <div class="row-head">
+      <span class="section-label">stack</span>
+      <span class="click-one mono">click one</span>
+    </div>
+    <Stack />
+  </section>
+
+  <footer class="fade-up" style="animation-delay:440ms">
+    <!-- Task 11 mounts the live claude-token spend readout here. -->
+    <div data-token-readout></div>
+    <span class="lights-hint">press <kbd class="key">t</kbd> to flip the lights</span>
+  </footer>
+</Base>
+
+<style>
+  header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: end;
+  }
+  .name-col {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    position: relative;
+  }
+  .tagline {
+    margin: 0;
+    font-size: 19px;
+    color: var(--fg2);
+    line-height: 1.4;
+  }
+
+  section {
+    display: flex;
+    flex-direction: column;
+  }
+  #work {
+    gap: 14px;
+  }
+  #learned {
+    gap: 14px;
+  }
+  #writing {
+    gap: 6px;
+  }
+  #projects {
+    gap: 6px;
+  }
+  #plot {
+    gap: 16px;
+  }
+  #stack {
+    gap: 12px;
+  }
+
+  .section-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--fg3);
+  }
+
+  .learned-lead {
+    margin: 0;
+    font-size: 16px;
+    color: var(--fg2);
+    line-height: 1.5;
+  }
+  .learned-link {
+    color: var(--accText);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-color: rgba(232, 176, 75, 0.4);
+    transition: text-decoration-color 0.15s;
+  }
+  .learned-link:hover {
+    text-decoration-color: var(--acc);
+  }
+  .learned-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .learned-item {
+    display: grid;
+    grid-template-columns: 18px 1fr;
+    gap: 10px;
+    font-size: 15.5px;
+    line-height: 1.5;
+    color: var(--fg);
+  }
+  .learned-arrow {
+    color: var(--acc);
+    font-size: 13px;
+    padding-top: 2px;
+  }
+
+  .row-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: 8px;
+  }
+  .all-link {
+    font-size: 12.5px;
+    color: var(--fg3);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .all-link:hover {
+    color: var(--fg);
+  }
+
+  .writing-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    align-items: baseline;
+    padding: 12px 10px;
+    margin: 0 -10px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--fg);
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    transition: background 0.15s;
+  }
+  .writing-row:hover {
+    background: var(--hov);
+  }
+  .writing-date {
+    font-size: 11.5px;
+    font-weight: 400;
+    color: var(--fg3);
+  }
+
+  .project-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .project-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 16px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--fg);
+    box-sizing: border-box;
+    transition: border-color 0.15s, transform 0.2s;
+  }
+  .project-card:hover {
+    border-color: var(--acc);
+    transform: translateY(-2px);
+  }
+  .project-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .project-name {
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .project-badge {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--fg3);
+  }
+  .project-desc {
+    font-size: 13.5px;
+    color: var(--fg2);
+    line-height: 1.45;
+  }
+
+  .plot-count {
+    font-size: 11.5px;
+    color: var(--fg3);
+  }
+  .plot-sub {
+    margin: 0;
+    font-size: 14px;
+    color: var(--fg2);
+    line-height: 1.5;
+  }
+
+  .click-one {
+    font-size: 11px;
+    color: var(--fg3);
+  }
+
+  footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    font-family: 'Geist Mono Variable', ui-monospace, monospace;
+    font-size: 12px;
+    color: var(--fg3);
+  }
+  .key {
+    font: inherit;
+    color: var(--fg2);
+    border: 1px solid var(--dockLine);
+    border-radius: 4px;
+    padding: 0 5px;
+  }
+</style>

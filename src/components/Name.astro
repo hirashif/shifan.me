@@ -1,0 +1,69 @@
+---
+// The name button scrambles in on load (see ./name.ts) and toggles a small
+// popover explaining the name. Server-rendered text is already the settled
+// "shifan" so it is correct before hydration and with JS disabled.
+---
+<button
+  type="button"
+  data-name
+  title="what does it mean?"
+  aria-haspopup="true"
+  aria-expanded="false"
+  aria-controls="name-tip"
+  class="name-btn"
+>shifan</button>
+<div id="name-tip" data-name-tip hidden class="name-tip" role="note">
+  <span class="name-tip-strong">shifan</span> — from the arabic <span class="name-tip-acc">shifā</span> (شفاء), "healing". <span class="name-tip-sub">my mom picked it. still trying to live up to it.</span>
+</div>
+
+<style>
+  .name-btn {
+    all: unset;
+    cursor: help;
+    align-self: flex-start;
+    font-size: 44px;
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    min-height: 44px;
+    text-decoration: underline dotted var(--fg3);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 8px;
+    transition: text-decoration-color 0.2s;
+  }
+  .name-btn:hover {
+    text-decoration-color: var(--acc);
+  }
+  .name-tip {
+    position: absolute;
+    top: 60px;
+    left: 0;
+    z-index: 5;
+    width: 300px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: var(--card);
+    border: 1px solid var(--dockLine);
+    box-shadow: var(--shadow);
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--fg2);
+    animation: pop 0.18s ease-out both;
+  }
+  .name-tip-strong {
+    color: var(--fg);
+    font-weight: 500;
+  }
+  .name-tip-acc {
+    color: var(--accText);
+  }
+  .name-tip-sub {
+    color: var(--fg3);
+  }
+</style>
+
+<script>
+  import { initName } from './name';
+  initName();
+</script>

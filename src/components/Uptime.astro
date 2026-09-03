@@ -1,0 +1,23 @@
+---
+import { calcUptime } from './uptime';
+const initial = calcUptime();
+---
+<div class="uptime-wrap mono tnum">uptime<br /><span data-uptime class="uptime-value tnum">{initial}</span> yrs</div>
+
+<style>
+  .uptime-wrap {
+    text-align: right;
+    font-size: 12px;
+    color: var(--fg3);
+    line-height: 1.6;
+  }
+  .uptime-value {
+    color: var(--fg);
+    font-size: 15px;
+  }
+</style>
+
+<script>
+  import { initUptime } from './uptime';
+  initUptime();
+</script>

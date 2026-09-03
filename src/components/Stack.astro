@@ -1,0 +1,115 @@
+---
+// Stack chip icons are bundled from the local `simple-icons` package (not
+// hotlinked from a CDN) per design_handoff/README.md § Assets. Each icon is
+// pulled in as a raw string via Vite's `?raw` import — resolved and inlined
+// at build time, so nothing reads the filesystem at request time (required
+// for the Cloudflare Workers runtime, which has no filesystem at all).
+import { stack } from '../content/stack';
+import goSvg from '../../node_modules/simple-icons/icons/go.svg?raw';
+import openjdkSvg from '../../node_modules/simple-icons/icons/openjdk.svg?raw';
+import pythonSvg from '../../node_modules/simple-icons/icons/python.svg?raw';
+import typescriptSvg from '../../node_modules/simple-icons/icons/typescript.svg?raw';
+import postgresqlSvg from '../../node_modules/simple-icons/icons/postgresql.svg?raw';
+import apachekafkaSvg from '../../node_modules/simple-icons/icons/apachekafka.svg?raw';
+import redisSvg from '../../node_modules/simple-icons/icons/redis.svg?raw';
+import springbootSvg from '../../node_modules/simple-icons/icons/springboot.svg?raw';
+import kubernetesSvg from '../../node_modules/simple-icons/icons/kubernetes.svg?raw';
+import dockerSvg from '../../node_modules/simple-icons/icons/docker.svg?raw';
+import terraformSvg from '../../node_modules/simple-icons/icons/terraform.svg?raw';
+import claudeSvg from '../../node_modules/simple-icons/icons/claude.svg?raw';
+
+const ICONS: Record<string, string> = {
+  go: goSvg,
+  openjdk: openjdkSvg,
+  python: pythonSvg,
+  typescript: typescriptSvg,
+  postgresql: postgresqlSvg,
+  apachekafka: apachekafkaSvg,
+  redis: redisSvg,
+  springboot: springbootSvg,
+  kubernetes: kubernetesSvg,
+  docker: dockerSvg,
+  terraform: terraformSvg,
+  claude: claudeSvg,
+};
+
+function iconPath(slug: string): string {
+  const raw = ICONS[slug];
+  if (!raw) throw new Error(`simple-icons: no icon bundled for slug "${slug}"`);
+  const match = raw.match(/<path d="([^"]+)"/);
+  if (!match) throw new Error(`simple-icons: no path found for slug "${slug}"`);
+  return match[1];
+}
+---
+<div class="chips">
+  {stack.map((s, i) => (
+    <button
+      type="button"
+      data-skill={i}
+      data-label={s.label}
+      data-note={s.note}
+      aria-pressed="false"
+      class="chip"
+    >
+      <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d={iconPath(s.slug)}></path></svg>
+      <span>{s.label}</span>
+    </button>
+  ))}
+</div>
+<div data-skill-note hidden class="skill-note">
+  <span data-skill-note-name class="skill-note-name"></span>
+  <span data-skill-note-text></span>
+</div>
+
+<style>
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 6px;
+  }
+  .chip {
+    all: unset;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    font-family: 'Geist Mono Variable', ui-monospace, monospace;
+    font-size: 12.5px;
+    color: var(--fg2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 4px 9px;
+    box-sizing: border-box;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .chip:hover,
+  .chip[aria-pressed='true'] {
+    border-color: var(--acc);
+    color: var(--fg);
+  }
+  .skill-note {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: var(--card);
+    border: 1px solid var(--dockLine);
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--fg2);
+    animation: pop 0.18s ease-out both;
+  }
+  .skill-note-name {
+    font-family: 'Geist Mono Variable', ui-monospace, monospace;
+    font-size: 12.5px;
+    color: var(--accText);
+    padding-top: 2px;
+  }
+</style>
+
+<script>
+  import { initStack } from './stack';
+  initStack();
+</script>

@@ -1,0 +1,72 @@
+---
+import { work } from '../content/work';
+---
+<div class="timeline">
+  {work.map((w) => (
+    <div data-work-row class="timeline-row">
+      <span class:list={['dot', { 'dot-current': w.isCurrent }]}></span>
+      <div>
+        <div class="row-title">{w.title} <span class="row-role">— {w.role}</span></div>
+        <div class="row-desc">{w.desc}</div>
+      </div>
+      <span class:list={['row-date', 'mono', 'tnum', { 'row-date-current': w.isCurrent }]}>
+        {w.isCurrent ? 'now' : w.dates}
+      </span>
+    </div>
+  ))}
+</div>
+
+<style>
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding-left: 22px;
+    border-left: 1px solid var(--line);
+    gap: 22px;
+  }
+  .timeline-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+  }
+  .dot {
+    position: absolute;
+    left: -27px;
+    top: 6px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    box-sizing: border-box;
+    background: var(--bg);
+    border: 1.5px solid var(--fg3);
+  }
+  .dot-current {
+    background: var(--acc);
+    border: none;
+    animation: pulse 1.8s ease-out infinite;
+  }
+  .row-title {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .row-role {
+    color: var(--fg2);
+    font-weight: 400;
+  }
+  .row-desc {
+    font-size: 14px;
+    color: var(--fg2);
+    line-height: 1.5;
+    margin-top: 2px;
+  }
+  .row-date {
+    font-size: 12px;
+    color: var(--fg3);
+    padding-top: 3px;
+  }
+  .row-date-current {
+    color: var(--accText);
+  }
+</style>
