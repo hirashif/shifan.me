@@ -1,0 +1,35 @@
+---
+import '@fontsource-variable/geist';
+import '@fontsource-variable/geist-mono';
+import '../styles/global.css';
+import Dock from '../components/Dock.astro';
+
+interface Props { title: string; description?: string; pad?: 'home' | 'sub' }
+const { title, description = 'backend. money and market data.', pad = 'sub' } = Astro.props;
+const padTop = pad === 'home' ? '104px' : '72px';
+const gap = pad === 'home' ? '64px' : '40px';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0a0a0b" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <script is:inline>
+      // Runs before first paint so the theme never flashes.
+      try {
+        var t = localStorage.getItem('shifan-theme');
+      } catch (e) { var t = null; }
+      document.documentElement.classList.add(t === 'light' ? 'th-light' : 'th-dark');
+    </script>
+  </head>
+  <body>
+    <main style={`max-width:680px;width:100%;margin:0 auto;padding:${padTop} 40px 40px;display:flex;flex-direction:column;gap:${gap};box-sizing:border-box`}>
+      <slot />
+    </main>
+    <Dock />
+  </body>
+</html>

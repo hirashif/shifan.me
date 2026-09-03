@@ -5,3 +5,17 @@ dist/
 .dev.vars
 .DS_Store
 *.log
+.superpowers/
+
+# environment variables
+.env
+.env.production
+
+# editor / OS
+.idea/
+
+# playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
