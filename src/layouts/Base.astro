@@ -4,10 +4,10 @@ import '@fontsource-variable/geist-mono';
 import '../styles/global.css';
 import Dock from '../components/Dock.astro';
 
-interface Props { title: string; description?: string; pad?: 'home' | 'sub' }
-const { title, description = 'backend. money and market data.', pad = 'sub' } = Astro.props;
+interface Props { title: string; description?: string; pad?: 'home' | 'sub'; gap?: string }
+const { title, description = 'backend. money and market data.', pad = 'sub', gap: gapOverride } = Astro.props;
 const padTop = pad === 'home' ? '104px' : '72px';
-const gap = pad === 'home' ? '64px' : '40px';
+const gap = gapOverride ?? (pad === 'home' ? '64px' : '40px');
 ---
 <!doctype html>
 <html lang="en">

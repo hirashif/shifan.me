@@ -1,0 +1,70 @@
+---
+import Base from '../layouts/Base.astro';
+import Plot from '../components/Plot.astro';
+---
+<Base title="the plot" gap="32px">
+  <a href="/" class="mono back-link">← shifan</a>
+
+  <header class="fade-up">
+    <div class="head-row">
+      <h1>the plot</h1>
+      <span class="count mono" data-plot-count><span data-plot-count-num>–</span> / 400</span>
+    </div>
+    <p class="sub">one pixel per visitor. pick a color, leave a line, hover to read the others. when it fills up, it's done.</p>
+  </header>
+
+  <div class="fade-up" style="animation-delay:100ms">
+    <Plot full />
+  </div>
+
+  <div class="footer-line fade-up" style="animation-delay:200ms">
+    click an empty cell to claim it. one pixel, one person — behind github sign-in on the live site.
+  </div>
+</Base>
+
+<style>
+  .back-link {
+    font-size: 12.5px;
+    color: var(--fg3);
+    text-decoration: none;
+    align-self: flex-start;
+    transition: color 0.15s;
+  }
+  .back-link:hover {
+    color: var(--fg);
+  }
+
+  header {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .head-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+  }
+  h1 {
+    margin: 0;
+    font-size: 36px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+  }
+  .count {
+    font-size: 12px;
+    color: var(--fg3);
+  }
+  .sub {
+    margin: 0;
+    font-size: 16px;
+    color: var(--fg2);
+    line-height: 1.5;
+  }
+
+  .footer-line {
+    font-size: 12px;
+    color: var(--fg3);
+  }
+</style>

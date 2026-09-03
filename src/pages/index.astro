@@ -4,6 +4,7 @@ import Name from '../components/Name.astro';
 import Uptime from '../components/Uptime.astro';
 import Timeline from '../components/Timeline.astro';
 import Stack from '../components/Stack.astro';
+import Plot from '../components/Plot.astro';
 import { learnings } from '../content/learnings';
 import { projects } from '../content/projects';
 import { getCollection } from 'astro:content';
@@ -84,11 +85,14 @@ const posts = (await getCollection('writing'))
   <section id="plot" class="fade-up" style="animation-delay:320ms">
     <div class="row-head">
       <span class="section-label">the plot</span>
-      <span class="plot-count mono" data-plot-count>– / 400 pixels claimed</span>
+      <span class="plot-count mono" data-plot-count><span data-plot-count-num>–</span> / 400 pixels claimed</span>
     </div>
     <p class="plot-sub">everyone who visits gets one pixel. pick a color, leave a line, hover to read the others.</p>
-    <!-- Task 10 mounts the interactive pixel grid + claim bar here. -->
-    <div data-plot-grid-mount></div>
+    <Plot />
+    <div class="plot-footer">
+      <span>click an empty cell to claim it. one pixel, one person.</span>
+      <a href="/plot" class="plot-footer-link">the whole plot →</a>
+    </div>
   </section>
 
   <section id="stack" class="fade-up" style="animation-delay:380ms">
@@ -284,6 +288,22 @@ const posts = (await getCollection('writing'))
     font-size: 14px;
     color: var(--fg2);
     line-height: 1.5;
+  }
+  .plot-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--fg3);
+  }
+  .plot-footer-link {
+    color: var(--fg2);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.15s;
+  }
+  .plot-footer-link:hover {
+    color: var(--fg);
   }
 
   .click-one {

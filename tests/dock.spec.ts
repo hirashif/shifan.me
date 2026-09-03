@@ -18,3 +18,24 @@ test('email button copies the address', async ({ page, context }) => {
   expect(await page.evaluate(() => navigator.clipboard.readText()))
     .toBe('shifan.hirani@gmail.com');
 });
+
+test('g key scrolls to the plot section', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#plot')).not.toBeInViewport();
+  await page.keyboard.press('g');
+  await expect(page.locator('#plot')).toBeInViewport();
+});
+
+test('g key is ignored while an input is focused', async ({ page }) => {
+  await page.goto('/');
+  // The plot's own "name" field lives inside #plot, so focusing it already
+  // scrolls the section into view — that's an artifact of focus, not the
+  // shortcut. Isolate the shortcut's effect by comparing scroll position
+  // immediately before and after pressing "g" once focus has settled.
+  await page.getByPlaceholder('name').click();
+  const before = await page.evaluate(() => window.scrollY);
+  await page.keyboard.press('g');
+  await page.waitForTimeout(300);
+  const after = await page.evaluate(() => window.scrollY);
+  expect(after).toBe(before);
+});

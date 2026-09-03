@@ -15,9 +15,7 @@ test('dock button toggles theme', async ({ page }) => {
   await expect(page.locator('html')).toHaveClass(/th-light/);
 });
 
-// /plot does not exist until a later task adds the claim-bar `name` input.
-// Un-fixme this once that page ships (see task 10 in the implementation plan).
-test.fixme('t is ignored while an input is focused', async ({ page }) => {
+test('t is ignored while an input is focused', async ({ page }) => {
   await page.goto('/plot');
   await page.getByPlaceholder('name').click();
   await page.keyboard.press('t');
