@@ -94,19 +94,19 @@ const posts = (await getCollection('writing'))
     </div>
   </section>
 
-  <Contributions delay={360} />
 
-  <section id="stack" class="fade-up" style="animation-delay:420ms">
+  <section id="stack" class="fade-up" style="animation-delay:360ms">
     <div class="row-head">
       <span class="section-label">stack</span>
     </div>
     <Stack />
   </section>
 
-  <section id="education" class="fade-up" style="animation-delay:480ms">
+  <section id="education" class="fade-up" style="animation-delay:420ms">
     <div class="section-label">education</div>
     <Education />
   </section>
+  <Contributions delay={480} />
 
   <footer class="fade-up" style="animation-delay:540ms">
     <div data-token-readout><TokenFooter /></div>
