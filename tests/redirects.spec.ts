@@ -22,7 +22,12 @@ const SLUG_TARGETS: Record<string, string> = {
 function assertStub(html: string, target: string) {
   expect(html).toContain(`<link rel="canonical" href="${target}" />`);
   expect(html).toContain(`<meta http-equiv="refresh" content="0; url=${target}" />`);
-  expect(html).toContain('<meta name="robots" content="noindex, follow" />');
+  // No `noindex`: pairing a canonical (consolidate link equity onto the new
+  // url) with noindex (drop this page from the index) sends conflicting
+  // signals and undercuts the very link-equity transfer these stubs exist
+  // for. `follow` alone (via the absence of `nofollow`, plus the canonical)
+  // is the correct signal here.
+  expect(html).not.toContain('noindex');
   expect(html).toContain(`location.replace('${target}');`);
   expect(html).toContain(`href="${target}">shifan.me</a>`);
   // every redirect target must carry a trailing slash
