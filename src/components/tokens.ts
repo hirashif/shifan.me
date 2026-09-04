@@ -4,6 +4,11 @@ export interface UsageSnapshot {
   year: number;
   tokensToday: number;
   updatedAt: number;
+  // The local YYYY-MM-DD day `today`/`tokensToday` cover, per
+  // scripts/push-usage.ts. Optional: a snapshot written before this field
+  // existed (the one already in production KV, for instance) simply
+  // doesn't have one.
+  date?: string;
 }
 
 // A snapshot is only ever pushed once a day by scripts/push-usage.ts run by
@@ -18,6 +23,29 @@ const tokenFmt = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFr
 
 export function isStale(updatedAt: number, now: number = Date.now()): boolean {
   return updatedAt <= 0 || now - updatedAt > STALE_MS;
+}
+
+// Mirrors the local-date logic in scripts/push-usage.ts (a different
+// runtime — Node vs. this browser bundle — so it isn't shared code, just
+// the same approach): local getters, not `toISOString` (always UTC), so a
+// viewer whose local day has already rolled over past UTC midnight (or not
+// yet reached it) is compared against their own calendar day, not UTC's.
+function localDateStr(d: Date = new Date()): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+// True when a snapshot's `today`/`tokensToday` no longer describe the
+// viewer's current local day. Snapshots are pushed by hand roughly once a
+// day, so the 48h staleness guard alone can't catch this: a snapshot
+// pushed at 11pm is still "fresh" at 9am the next day even though its
+// `today` figure now describes yesterday. A snapshot with no `date` at all
+// (any pushed before this field existed) is treated as unknown — better to
+// dash out a real number than risk presenting a stale one as current.
+export function isRollover(date: string | undefined, now: Date = new Date()): boolean {
+  return date === undefined || date !== localDateStr(now);
 }
 
 export function fmtUsd(n: number): string {
@@ -55,11 +83,15 @@ export async function initTokenFooter(): Promise<void> {
       cardTokens.textContent = DASH;
       return;
     }
-    amountEl.textContent = fmtUsd(snap.today);
-    cardToday.textContent = fmtUsd(snap.today);
+    // `week` and `year` don't describe a single calendar day, so a day
+    // rollover doesn't make them wrong — only `today`/`tokensToday` get
+    // dashed when the snapshot's date no longer matches the viewer's.
+    const rollover = isRollover(snap.date);
+    amountEl.textContent = rollover ? DASH : fmtUsd(snap.today);
+    cardToday.textContent = rollover ? DASH : fmtUsd(snap.today);
     cardWeek.textContent = fmtUsd(snap.week);
     cardYear.textContent = fmtUsd(snap.year);
-    cardTokens.textContent = fmtTokenCount(snap.tokensToday);
+    cardTokens.textContent = rollover ? DASH : fmtTokenCount(snap.tokensToday);
   };
 
   try {

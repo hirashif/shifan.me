@@ -28,6 +28,17 @@ function coerceNonNegative(v: unknown): number {
   return Number.isFinite(n) && n >= 0 ? n : 0;
 }
 
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+// The local YYYY-MM-DD day `today`/`tokensToday` describe, per
+// scripts/push-usage.ts. Anything that isn't exactly that shape (missing,
+// wrong type, malformed) is dropped rather than stored — an unparseable
+// date is worse than no date, since tokens.ts treats a missing date as
+// "unknown, dash it out" but would mis-render a garbage string as-is.
+function coerceDate(v: unknown): string | undefined {
+  return typeof v === 'string' && DATE_RE.test(v) ? v : undefined;
+}
+
 export const POST: APIRoute = async ({ request }) => {
   const auth = request.headers.get('authorization') ?? '';
   const expected = `Bearer ${env.USAGE_TOKEN}`;
@@ -48,6 +59,7 @@ export const POST: APIRoute = async ({ request }) => {
     year: coerceNonNegative(body.year),
     tokensToday: coerceNonNegative(body.tokensToday),
     updatedAt: Date.now(),
+    date: coerceDate(body.date),
   };
 
   await env.USAGE.put('usage:latest', JSON.stringify(snapshot));

@@ -68,6 +68,14 @@ const snapshot = {
   week: Number(sum(weekRows, 'totalCost').toFixed(2)),
   year: Number(sum(daily, 'totalCost').toFixed(2)),
   tokensToday: sum(todayRows, 'totalTokens'),
+  // The local calendar day this snapshot's `today`/`tokensToday` cover.
+  // Snapshots are pushed by hand roughly once a day, so the 48h staleness
+  // guard in tokens.ts can't by itself detect a day rollover — a snapshot
+  // pushed at 11pm is still "fresh" at 9am the next day even though its
+  // `today` figure now describes yesterday. Carrying the calendar day lets
+  // the footer dash out `today` once the viewer's own local date moves past
+  // it, without waiting for the 48h guard to catch up.
+  date: today,
 };
 
 const res = await fetch(ENDPOINT, {

@@ -1,6 +1,18 @@
 import { test, expect } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
+import { isRollover } from '../src/components/tokens';
+
+// Matches the local-date logic in src/components/tokens.ts / scripts/push-
+// usage.ts: local getters, not `toISOString()` (always UTC) — the browser
+// page these tests drive renders using its own local date, which is this
+// machine's local date, not UTC's.
+function localDateStr(d: Date = new Date()): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
 
 // The real secret lives only in `.dev.vars` (gitignored) and in the
 // Cloudflare secret store — never in source. Reading it live from
@@ -110,7 +122,7 @@ test.describe('POST /api/usage with a valid token', () => {
 
 test.describe('footer staleness on the homepage', () => {
   test('a fresh snapshot renders a real figure', async ({ page }) => {
-    putUsageSnapshot({ today: 7.5, week: 20, year: 300, tokensToday: 99000, updatedAt: Date.now() });
+    putUsageSnapshot({ today: 7.5, week: 20, year: 300, tokensToday: 99000, updatedAt: Date.now(), date: localDateStr() });
     await page.goto('/');
     const amount = page.locator('[data-tok-amount]');
     await expect(amount).toHaveText('$7.50');
@@ -118,9 +130,55 @@ test.describe('footer staleness on the homepage', () => {
 
   test('a snapshot older than 48 hours renders — instead of the stale figure', async ({ page }) => {
     const staleUpdatedAt = Date.now() - 49 * 60 * 60 * 1000;
-    putUsageSnapshot({ today: 7.5, week: 20, year: 300, tokensToday: 99000, updatedAt: staleUpdatedAt });
+    putUsageSnapshot({ today: 7.5, week: 20, year: 300, tokensToday: 99000, updatedAt: staleUpdatedAt, date: localDateStr() });
     await page.goto('/');
     const amount = page.locator('[data-tok-amount]');
     await expect(amount).toHaveText('—');
+  });
+});
+
+test.describe('day-rollover guard on the homepage footer', () => {
+  // The 48h staleness guard alone can't catch this: a snapshot pushed
+  // yesterday evening is still well within 48h this morning, but its
+  // `today` figure describes a day that's already over for the viewer.
+  test('a fresh-but-yesterday snapshot dashes today, not week/year', async ({ page }) => {
+    putUsageSnapshot({
+      today: 7.5,
+      week: 20,
+      year: 300,
+      tokensToday: 99000,
+      updatedAt: Date.now(),
+      date: '2000-01-01', // never equals "today" regardless of when this test runs
+    });
+    await page.goto('/');
+    await expect(page.locator('[data-tok-amount]')).toHaveText('—');
+    // Open the hover card to check week/year, which should still be real.
+    await page.locator('[data-tok-wrap]').hover();
+    await expect(page.locator('[data-tok-card-today]')).toHaveText('—');
+    await expect(page.locator('[data-tok-card-week]')).toHaveText('$20.00');
+    await expect(page.locator('[data-tok-card-year]')).toHaveText('$300.00');
+    await expect(page.locator('[data-tok-card-tokens]')).toHaveText('—');
+  });
+
+  test('a snapshot with no date field at all is treated as unknown, not crashing', async ({ page }) => {
+    putUsageSnapshot({ today: 7.5, week: 20, year: 300, tokensToday: 99000, updatedAt: Date.now() });
+    await page.goto('/');
+    await expect(page.locator('[data-tok-amount]')).toHaveText('—');
+  });
+});
+
+test.describe('isRollover', () => {
+  test('the viewer\'s own local date matches is not a rollover', () => {
+    const now = new Date(2026, 0, 15, 10, 0, 0); // local Jan 15 2026, 10am
+    expect(isRollover('2026-01-15', now)).toBe(false);
+  });
+
+  test('a date before the viewer\'s local today is a rollover', () => {
+    const now = new Date(2026, 0, 15, 10, 0, 0);
+    expect(isRollover('2026-01-14', now)).toBe(true);
+  });
+
+  test('an undefined date (a pre-migration snapshot) is a rollover', () => {
+    expect(isRollover(undefined, new Date())).toBe(true);
   });
 });
