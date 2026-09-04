@@ -13,10 +13,15 @@ test('the resume page is noindex', async ({ page }) => {
     .toHaveAttribute('content', /noindex/);
 });
 
-test('the pdf is served', async ({ request }) => {
-  const res = await request.get('/resume.pdf');
+test('the pdf is served at its high-entropy path', async ({ request }) => {
+  const res = await request.get('/r-9f4c2ae81b7d63.pdf');
   expect(res.status()).toBe(200);
   expect(res.headers()['content-type']).toContain('pdf');
+});
+
+test('the old guessable /resume.pdf path is gone, with no redirect', async ({ request }) => {
+  const res = await request.get('/resume.pdf', { maxRedirects: 0 });
+  expect(res.status()).toBe(404);
 });
 
 test('nothing on the site links to the resume', async ({ page }) => {
