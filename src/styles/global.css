@@ -17,6 +17,14 @@
   color-scheme: light;
 }
 
+/* Every `hidden` toggle on the site (Plot.astro's tooltip/claim-bar/error
+   line, TokenFooter.astro's card) currently only hides because Tailwind's
+   preflight ships `[hidden]{display:none!important}` — and Tailwind is
+   otherwise unused here (zero utility classes, no @theme). Owning this
+   rule explicitly means dropping Tailwind later can't silently break every
+   hidden element on the page. */
+[hidden] { display: none !important; }
+
 html, body { margin:0; padding:0; }
 body {
   min-height:100vh; background:var(--bg); color:var(--fg);

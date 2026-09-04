@@ -148,12 +148,15 @@ const cells = Array.from({ length: CELLS }, (_, i) => i);
     border-radius: 10px;
     box-sizing: border-box;
   }
-  /* `.claim-bar { display: grid }` above has the same specificity as the UA
-     stylesheet's `[hidden] { display: none }` rule, and an author stylesheet
-     wins that tie — so without this, toggling the `hidden` property from
-     plot.ts would have no visual effect and wouldn't remove the bar from
-     the tab order either (removeAttribute happens, but layout still shows
-     it). This makes `hidden` the single source of truth for visibility. */
+  /* `.claim-bar[hidden]` combines a class selector with the attribute
+     selector, so it outranks the plain `.claim-bar { display: grid }` rule
+     above on specificity — that's the actual mechanism, not a tie with any
+     UA-stylesheet rule. Without this, toggling `hidden` from plot.ts would
+     set the attribute but `.claim-bar`'s own `display: grid` would still
+     win, leaving the bar visually shown (and in the tab order) regardless.
+     global.css also carries an unconditional `[hidden] { display: none
+     !important }` as the real source of truth site-wide; this rule stays
+     as an explicit, self-contained backstop for this component. */
   .claim-bar[hidden] {
     display: none;
   }

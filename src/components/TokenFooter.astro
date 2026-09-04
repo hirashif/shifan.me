@@ -52,10 +52,14 @@
     gap: 8px;
     animation: pop 0.18s ease-out both;
   }
-  /* Same specificity gotcha as Plot.astro's `.claim-bar[hidden]`: the
-     `display:flex` above ties with the UA `[hidden]{display:none}` rule,
-     and an author stylesheet wins that tie, so without this the `hidden`
-     property toggled from tokens.ts wouldn't actually hide the card. */
+  /* Same specificity gotcha as Plot.astro's `.claim-bar[hidden]`: combining
+     the class and attribute selectors here outranks the plain `.tok-card {
+     display: flex }` rule above on specificity, which is what makes
+     `hidden` win — not a tie with any UA-stylesheet rule. Without this,
+     `hidden` toggled from tokens.ts wouldn't actually hide the card.
+     global.css also carries an unconditional `[hidden] { display: none
+     !important }` as the real source of truth site-wide; this rule stays
+     as an explicit, self-contained backstop for this component. */
   .tok-card[hidden] {
     display: none;
   }
