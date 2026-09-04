@@ -4,7 +4,11 @@ import { work } from '../content/work';
 <div class="timeline">
   {work.map((w) => (
     <div data-work-row class="timeline-row">
-      <span class:list={['dot', { 'dot-current': w.isCurrent }]}></span>
+      {w.logo && !w.isCurrent ? (
+        <img class="row-logo" src={w.logo} alt={w.title} width="18" height="18" loading="lazy" />
+      ) : (
+        <span class:list={['dot', { 'dot-current': w.isCurrent }]}></span>
+      )}
       <div>
         <div class="row-title">{w.title} <span class="row-role">— {w.role}</span></div>
         <div class="row-desc">{w.desc}</div>
@@ -46,6 +50,15 @@ import { work } from '../content/work';
     background: var(--acc);
     border: none;
     animation: pulse 1.8s ease-out infinite;
+  }
+  .row-logo {
+    position: absolute;
+    left: -31px;
+    top: -1px;
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    object-fit: contain;
   }
   .row-title {
     font-size: 16px;

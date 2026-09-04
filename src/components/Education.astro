@@ -4,9 +4,12 @@ import { education } from '../content/education';
 <div class="education">
   {education.map((e) => (
     <div data-education-row class="education-row">
-      <div>
-        <div class="row-title">{e.school} <span class="row-degree">— {e.degree}</span></div>
-        {e.note && <div class="row-note">{e.note}</div>}
+      <div class="row-main">
+        {e.logo && <img class="row-logo" src={e.logo} alt={e.school} width="17" height="17" loading="lazy" />}
+        <div>
+          <div class="row-title">{e.school} <span class="row-degree">— {e.degree}</span></div>
+          {e.note && <div class="row-note">{e.note}</div>}
+        </div>
       </div>
       <span class="row-meta mono tnum">{e.meta}</span>
     </div>
@@ -23,6 +26,19 @@ import { education } from '../content/education';
     display: grid;
     grid-template-columns: 1fr auto;
     gap: 16px;
+  }
+  .row-main {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .row-logo {
+    width: 17px;
+    height: 17px;
+    border-radius: 4px;
+    object-fit: contain;
+    margin-top: 1px;
+    flex-shrink: 0;
   }
   .row-title {
     font-size: 14.5px;

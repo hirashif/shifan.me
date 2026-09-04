@@ -27,6 +27,6 @@ export const projects: Project[] = [
   },
   {
     name: 'the cross desk',
-    desc: 'nothing real-time in it, on purpose.',
+    desc: 'coming soon.',
   },
 ];

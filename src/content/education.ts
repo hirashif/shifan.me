@@ -3,6 +3,7 @@ export interface EducationRow {
   degree: string;
   meta: string;
   note?: string;
+  logo?: string;
 }
 
 export const education: EducationRow[] = [
@@ -11,10 +12,6 @@ export const education: EducationRow[] = [
     degree: 'b.s. computer science',
     meta: '2020 – 2024',
     note: 'business concentration. distinguished student, three semesters.',
-  },
-  {
-    school: 'the aga khan academy',
-    degree: 'international baccalaureate',
-    meta: 'hyderabad',
+    logo: '/logos/tamu.png',
   },
 ];
