@@ -1,18 +1,18 @@
 ---
 import Base from '../layouts/Base.astro';
 ---
-<Base title="resume" description="">
+<Base title="resume" description="one-page resume, pdf.">
   <Fragment slot="head">
     <meta name="robots" content="noindex, nofollow" />
   </Fragment>
   <a href="/" class="mono back-link">← back to shifan.me</a>
-  <object data="/r-9f4c2ae81b7d63.pdf" type="application/pdf" class="pdf-embed">
+  <object data="/resume.pdf" type="application/pdf" class="pdf-embed">
     <p class="fallback-text">
       your browser will not display this inline.
-      <a href="/r-9f4c2ae81b7d63.pdf" class="fallback-link">open the pdf</a>.
+      <a href="/resume.pdf" class="fallback-link">open the pdf</a>.
     </p>
   </object>
-  <a href="/r-9f4c2ae81b7d63.pdf" class="mono open-link">open the pdf →</a>
+  <a href="/resume.pdf" class="mono open-link">open the pdf →</a>
 </Base>
 
 <style>

@@ -18,10 +18,20 @@ Floating dock at the bottom on every page: home · writing · learnings · plot 
 - **Only "shifan".** The last name never appears anywhere on the site, in metadata, or in alt text. Email is fine.
 - **No resume link/page in the site's navigation or content.** Work history lives in
   the timeline on home. One deliberate exception, added at shifan's request: an
-  *unlisted* resume page at a high-entropy path (`/2v16erb7nu5o5c`), `noindex`, linked
-  from nowhere on the site and excluded from the sitemap. It exists so shifan can hand
-  the link out directly. Do not link to it, and do not delete it.
-- **lowercase everywhere.** copy, headings, nav, tooltips. brand names too (paycom, postgres). the only capitals are in code/badges like `LIVE`.
+  *unlisted* resume page at `/resume` (PDF at `/resume.pdf`). The path used to be a
+  high-entropy string (`/2v16erb7nu5o5c`, which now 301-redirects to `/resume` — keep
+  that redirect, old links are out in the wild); shifan asked for the readable path
+  instead because the unguessable one "reads weird in emails," accepting that a
+  readable path is guessable in exchange for it being shareable. It stays out of search
+  two ways: `<meta name="robots" content="noindex, nofollow">` on the page, and an
+  `X-Robots-Tag: noindex, nofollow, noarchive, noai, noimageai` response header on both
+  `/resume` and `/resume.pdf` via `public/_headers` (the header is the only way to
+  noindex the PDF itself — it can't carry a meta tag). It is still linked from nowhere
+  on the site and excluded from any sitemap. Do not link to it, do not delete it, and do
+  not "fix" the path back to something high-entropy — that reversal was intentional.
+- **lowercase everywhere.** copy, headings, nav, tooltips. brand names too (paycom, postgres). the only capitals are in code/badges like `LIVE`. Approved exception: roman
+  numerals in job titles, e.g. `software developer II` (see `src/content/work.ts`) — same
+  spirit as the `LIVE`/`OSS` badge exception, not a loophole to generalize from.
 - **One accent: yellow `#e8b04b`.** No other accent colors except the plot palette. Light-mode text-on-light uses `#8a6100` for contrast.
 - **Dark and light are equal citizens.** Every new element must use the CSS variables below, never hardcoded fg/bg.
 - **Boring is the point.** No gradients, no cards-with-left-borders, no emoji, no marketing copy. If it feels like a landing page, undo it.

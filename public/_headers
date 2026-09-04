@@ -1,0 +1,16 @@
+# The resume moved to a readable, guessable path on purpose (shifan wants a
+# link he can paste into an email). To keep it out of search results anyway,
+# every response for it carries X-Robots-Tag — this is the only way to mark
+# the PDF noindex, since a PDF can't carry a <meta> tag. The HTML page also
+# repeats this via a <meta name="robots"> tag in src/pages/resume.astro.
+#
+# NOTE: the @astrojs/cloudflare adapter injects its own immutable
+# Cache-Control block for /_astro/* at the top of this file during
+# `astro build` (see astro:build:done in @astrojs/cloudflare) — it prepends
+# rather than overwrites, so this file's own rules below are preserved as-is
+# on every build. Don't reorder this file expecting it to stay put.
+/resume
+  X-Robots-Tag: noindex, nofollow, noarchive, noai, noimageai
+
+/resume.pdf
+  X-Robots-Tag: noindex, nofollow, noarchive, noai, noimageai

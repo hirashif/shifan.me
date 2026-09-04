@@ -10,9 +10,9 @@ export interface WorkRow {
 export const work: WorkRow[] = [
   {
     title: 'paycom',
-    role: 'software developer ii, crm team',
+    role: 'software developer II, crm team',
     desc: 'backend crm services and internal tools.',
-    dates: 'sep 2024 – jun 2026',
+    dates: 'sep 2024 – may 2026',
     logo: '/logos/paycom.png',
   },
   {

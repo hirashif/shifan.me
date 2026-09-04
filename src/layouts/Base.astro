@@ -4,8 +4,24 @@ import '@fontsource-variable/geist-mono';
 import '../styles/global.css';
 import Dock from '../components/Dock.astro';
 
-interface Props { title: string; description?: string; pad?: 'home' | 'sub'; gap?: string }
-const { title, description = 'backend. money and market data.', pad = 'sub', gap: gapOverride } = Astro.props;
+interface Props {
+  title: string;
+  description?: string;
+  pad?: 'home' | 'sub';
+  gap?: string;
+  image?: string;
+  type?: 'website' | 'article';
+}
+const {
+  title,
+  description = 'backend. money and market data.',
+  pad = 'sub',
+  gap: gapOverride,
+  image = '/og.png',
+  type = 'website',
+} = Astro.props;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
+const ogImageUrl = new URL(image, Astro.site);
 const padTop = pad === 'home' ? '104px' : '72px';
 const padTop640 = pad === 'home' ? '56px' : '44px';
 const padTop420 = pad === 'home' ? '44px' : '36px';
@@ -21,9 +37,23 @@ const gap420 = `${Math.max(18, Math.round(gapPx * 0.45))}px`;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0a0a0b" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content="shifan.me" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
     <slot name="head" />
     <script is:inline>
       // Runs before first paint so the theme never flashes.

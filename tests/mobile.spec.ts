@@ -8,7 +8,7 @@ import { test, expect } from '@playwright/test';
 // check a user would hit; comparing against `window.innerWidth` alone can
 // be thrown off by scrollbar gutters, so both are asserted here directly
 // against `document.documentElement`.
-const routes = ['/', '/writing', '/writing/ordering', '/learnings', '/plot', '/2v16erb7nu5o5c'];
+const routes = ['/', '/writing', '/writing/ordering', '/learnings', '/plot', '/resume'];
 
 test.describe('no horizontal overflow at 375px', () => {
   test.use({ viewport: { width: 375, height: 812 } });
