@@ -38,4 +38,10 @@ export function initName() {
       setOpen(false);
     }
   });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && tip && !tip.hidden) {
+      setOpen(false);
+      btn.focus();
+    }
+  });
 }

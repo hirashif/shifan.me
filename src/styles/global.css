@@ -12,7 +12,7 @@
 .th-light {
   --bg:#faf9f6; --fg:#1a1a1a; --fg2:#5c5c62; --fg3:#8f8f96; --line:#e8e6e0;
   --card:#ffffff; --hov:#f0eee8; --dock:rgba(255,255,255,.85); --dockLine:#e8e6e0;
-  --acc:#e8b04b; --accText:#8a6100; --shadow:0 12px 32px rgba(0,0,0,.1);
+  --acc:#b8821f; --accText:#8a6100; --shadow:0 12px 32px rgba(0,0,0,.1);
   --cellEmpty:#ecebe6;
   color-scheme: light;
 }

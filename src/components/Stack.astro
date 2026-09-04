@@ -17,7 +17,15 @@ import kubernetesSvg from '../../node_modules/simple-icons/icons/kubernetes.svg?
 import dockerSvg from '../../node_modules/simple-icons/icons/docker.svg?raw';
 import terraformSvg from '../../node_modules/simple-icons/icons/terraform.svg?raw';
 import claudeSvg from '../../node_modules/simple-icons/icons/claude.svg?raw';
+import cursorSvg from '../../node_modules/simple-icons/icons/cursor.svg?raw';
+import opencodeSvg from '../../node_modules/simple-icons/icons/opencode.svg?raw';
+import reactSvg from '../../node_modules/simple-icons/icons/react.svg?raw';
+import githubactionsSvg from '../../node_modules/simple-icons/icons/githubactions.svg?raw';
 
+// `codex` and `azure` have no icon in this installed simple-icons version
+// (16.29.0) — confirmed by checking node_modules/simple-icons/icons/ before
+// wiring these up. Both chips fall back to no icon (label only) rather than
+// an invented path or a broken import.
 const ICONS: Record<string, string> = {
   go: goSvg,
   openjdk: openjdkSvg,
@@ -31,30 +39,39 @@ const ICONS: Record<string, string> = {
   docker: dockerSvg,
   terraform: terraformSvg,
   claude: claudeSvg,
+  cursor: cursorSvg,
+  opencode: opencodeSvg,
+  react: reactSvg,
+  githubactions: githubactionsSvg,
 };
 
-function iconPath(slug: string): string {
+function iconPath(slug: string): string | null {
   const raw = ICONS[slug];
-  if (!raw) throw new Error(`simple-icons: no icon bundled for slug "${slug}"`);
+  if (!raw) return null;
   const match = raw.match(/<path d="([^"]+)"/);
   if (!match) throw new Error(`simple-icons: no path found for slug "${slug}"`);
   return match[1];
 }
 ---
 <div class="chips">
-  {stack.map((s, i) => (
-    <button
-      type="button"
-      data-skill={i}
-      data-label={s.label}
-      data-note={s.note}
-      aria-pressed="false"
-      class="chip"
-    >
-      <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d={iconPath(s.slug)}></path></svg>
-      <span>{s.label}</span>
-    </button>
-  ))}
+  {stack.map((s, i) => {
+    const path = iconPath(s.slug);
+    return (
+      <button
+        type="button"
+        data-skill={i}
+        data-label={s.label}
+        data-note={s.note}
+        aria-pressed="false"
+        class="chip"
+      >
+        {path && (
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d={path}></path></svg>
+        )}
+        <span>{s.label}</span>
+      </button>
+    );
+  })}
 </div>
 <div data-skill-note hidden class="skill-note">
   <span data-skill-note-name class="skill-note-name"></span>

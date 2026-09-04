@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import { fmtDate } from '../../lib/date';
+import { fmtMonth } from '../../lib/date';
 
 const posts = (await getCollection('writing'))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
@@ -30,7 +30,7 @@ const tags = ['all', ...new Set(posts.map((p) => p.data.tag))];
       <a href={`/writing/${post.id}`} data-post data-post-tag={post.data.tag} class="row">
         <div class="row-top">
           <span class="row-title">{post.data.title}</span>
-          <span class="row-date mono">{fmtDate(post.data.date)}</span>
+          <span class="row-date mono">{fmtMonth(post.data.date)}</span>
         </div>
         <div class="row-excerpt">{post.data.excerpt}</div>
         <div class="row-meta mono">
@@ -96,7 +96,7 @@ const tags = ['all', ...new Set(posts.map((p) => p.data.tag))];
     color: var(--accText);
     text-decoration: underline;
     text-underline-offset: 4px;
-    text-decoration-color: rgba(232, 176, 75, 0.4);
+    text-decoration-color: color-mix(in srgb, var(--acc) 40%, transparent);
     transition: text-decoration-color 0.15s;
   }
   .learned-link:hover {

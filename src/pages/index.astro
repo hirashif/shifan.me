@@ -3,13 +3,14 @@ import Base from '../layouts/Base.astro';
 import Name from '../components/Name.astro';
 import Uptime from '../components/Uptime.astro';
 import Timeline from '../components/Timeline.astro';
+import Education from '../components/Education.astro';
 import Stack from '../components/Stack.astro';
 import Plot from '../components/Plot.astro';
 import TokenFooter from '../components/TokenFooter.astro';
 import { learnings } from '../content/learnings';
 import { projects } from '../content/projects';
 import { getCollection } from 'astro:content';
-import { fmtDate } from '../lib/date';
+import { fmtMonth } from '../lib/date';
 
 const learnedPreview = learnings.slice(0, 3);
 
@@ -21,7 +22,7 @@ const posts = (await getCollection('writing'))
   <header class="fade-up" style="animation-delay:0ms">
     <div class="name-col">
       <Name />
-      <p class="tagline">backend. money and market data.</p>
+      <p class="tagline">agentic systems, fintech tools, and side projects that sometimes turn into real ones.</p>
     </div>
     <Uptime />
   </header>
@@ -53,7 +54,7 @@ const posts = (await getCollection('writing'))
     {posts.map((post) => (
       <a href={`/writing/${post.id}`} class="writing-row">
         <span>{post.data.title}</span>
-        <span class="writing-date mono">{fmtDate(post.data.date)}</span>
+        <span class="writing-date mono">{fmtMonth(post.data.date)}</span>
       </a>
     ))}
   </section>
@@ -66,7 +67,6 @@ const posts = (await getCollection('writing'))
           <>
             <div class="project-head">
               <span class="project-name">{p.name}</span>
-              <span class="project-badge mono">{p.badge}</span>
             </div>
             <span class="project-desc">{p.desc}</span>
           </>
@@ -101,7 +101,12 @@ const posts = (await getCollection('writing'))
     <Stack />
   </section>
 
-  <footer class="fade-up" style="animation-delay:440ms">
+  <section id="education" class="fade-up" style="animation-delay:440ms">
+    <div class="section-label">education</div>
+    <Education />
+  </section>
+
+  <footer class="fade-up" style="animation-delay:500ms">
     <div data-token-readout><TokenFooter /></div>
     <span class="lights-hint">press <kbd class="key">t</kbd> to flip the lights</span>
   </footer>
@@ -149,6 +154,9 @@ const posts = (await getCollection('writing'))
   #stack {
     gap: 12px;
   }
+  #education {
+    gap: 14px;
+  }
 
   .section-label {
     font-size: 13px;
@@ -166,7 +174,7 @@ const posts = (await getCollection('writing'))
     color: var(--accText);
     text-decoration: underline;
     text-underline-offset: 4px;
-    text-decoration-color: rgba(232, 176, 75, 0.4);
+    text-decoration-color: color-mix(in srgb, var(--acc) 40%, transparent);
     transition: text-decoration-color 0.15s;
   }
   .learned-link:hover {
@@ -264,11 +272,6 @@ const posts = (await getCollection('writing'))
   .project-name {
     font-size: 15px;
     font-weight: 500;
-  }
-  .project-badge {
-    font-size: 10px;
-    letter-spacing: 0.08em;
-    color: var(--fg3);
   }
   .project-desc {
     font-size: 13.5px;

@@ -5,12 +5,10 @@ const writing = defineCollection({
   loader: glob({ pattern: '**/*.mdx', base: './src/content/writing' }),
   schema: z.object({
     title: z.string(),
-    // NOTE: `date` is 2026-08-28 for all seven migrated posts — that's the git commit
-    // date the old site's writeups were published under (verified against full history,
-    // not the --depth 1 clone used during migration). No per-post authoring date exists
-    // in the old HTML or in git; this is one shared publication date, not per-post
-    // authored dates. See task-4-report.md for detail. Correct individual dates by hand
-    // if real ones surface later.
+    // NOTE: `date` is author-assigned per post, not derived from git history — shifan
+    // sets it by hand when a post is written or backdated to when the work happened.
+    // Displayed as month-only (see src/lib/date.ts), so day-level precision here mostly
+    // just controls sort order among posts published in the same month.
     date: z.coerce.date(),
     tag: z.string(),
     minutes: z.number(),

@@ -65,4 +65,34 @@ export const stack: Skill[] = [
     label: 'claude code',
     note: 'pair programmer. see the token bill in the footer.',
   },
+  {
+    slug: 'cursor',
+    label: 'cursor',
+    note: 'day-to-day editor. cmd-k for the boilerplate i used to type by hand.',
+  },
+  {
+    slug: 'opencode',
+    label: 'opencode',
+    note: 'open-source agent harness, running next to claude code.',
+  },
+  {
+    slug: 'codex',
+    label: 'codex',
+    note: "openai's cli agent — a second opinion when claude gets stuck on something.",
+  },
+  {
+    slug: 'react',
+    label: 'react',
+    note: "gridloom's frontend. hooks and nothing else.",
+  },
+  {
+    slug: 'azure',
+    label: 'azure',
+    note: 'aks cluster behind the market pipeline, all provisioned in terraform.',
+  },
+  {
+    slug: 'githubactions',
+    label: 'github actions',
+    note: 'ci on every repo above. tests run before anything merges.',
+  },
 ];

@@ -16,7 +16,12 @@ test('uptime counter is live and has nine decimals', async ({ page }) => {
 
 test('timeline shows every work row', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('[data-work-row]')).toHaveCount(6);
+  await expect(page.locator('[data-work-row]')).toHaveCount(5);
+});
+
+test('education section lists both entries', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('[data-education-row]')).toHaveCount(2);
 });
 
 test('name popover opens on click', async ({ page }) => {

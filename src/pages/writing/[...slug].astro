@@ -1,7 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import { fmtDate } from '../../lib/date';
+import { fmtMonth } from '../../lib/date';
 
 export async function getStaticPaths() {
   const posts = await getCollection('writing');
@@ -20,7 +20,7 @@ const { Content } = await render(post);
       <div class="post-meta mono">
         <span class="post-tag">{post.data.tag}</span>
         <span>{post.data.minutes} min</span>
-        <span>{fmtDate(post.data.date)}</span>
+        <span>{fmtMonth(post.data.date)}</span>
       </div>
     </header>
     <div class="prose">
@@ -108,7 +108,7 @@ const { Content } = await render(post);
     color: var(--accText);
     text-decoration: underline;
     text-underline-offset: 3px;
-    text-decoration-color: rgba(232, 176, 75, 0.4);
+    text-decoration-color: color-mix(in srgb, var(--acc) 40%, transparent);
     transition: text-decoration-color 0.15s;
   }
   .prose :global(a:hover) {
