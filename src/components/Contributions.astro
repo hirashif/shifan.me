@@ -7,15 +7,19 @@ const { delay = 80 } = Astro.props;
 // This page is static-prerendered (no `prerender = false` here — the live
 // data has to come from /api/contributions at request time, via the client
 // script below, not from this frontmatter). So the grid ships with a blank
-// (level-0) placeholder of a typical year's shape — 53 weeks, 7 rows — to
-// reserve its footprint from first paint. The client script recolors these
-// same nodes once real data arrives; because the row count (7) and cell
-// size are fixed by CSS, swapping placeholder cells for real ones (even a
-// week or two off in column count) never changes the section's height, so
-// it never shifts layout on the common "it worked" path. Only the rare
-// failure path (GitHub unreachable, empty response) collapses the section,
-// which is the one case where a shift is unavoidable.
-const PLACEHOLDER_WEEKS = 53;
+// (level-0) placeholder shaped like the trimmed window the API now returns
+// — 13 weeks (last ~3 months), 7 rows — to reserve its footprint from first
+// paint. See WINDOW_WEEKS in src/lib/contributions.ts, which this mirrors;
+// kept as a literal here (Astro frontmatter is server-only and this file
+// has no other reason to import that module) rather than duplicated as a
+// shared import. The client script recolors these same nodes once real
+// data arrives; because the row count (7) and cell size are fixed by CSS,
+// swapping placeholder cells for real ones (even a week off in column
+// count) never changes the section's height, so it never shifts layout on
+// the common "it worked" path. Only the rare failure path (GitHub
+// unreachable, empty response) collapses the section, which is the one
+// case where a shift is unavoidable.
+const PLACEHOLDER_WEEKS = 13;
 const placeholderCells = Array.from({ length: PLACEHOLDER_WEEKS * 7 });
 ---
 
@@ -40,37 +44,45 @@ const placeholderCells = Array.from({ length: PLACEHOLDER_WEEKS * 7 });
     color: var(--fg3);
     padding-bottom: 8px;
   }
-  /* Horizontal scroller so a full year (~53 weeks) never forces the page
-     itself to overflow at narrow widths — only this strip scrolls. */
+  /* At the full year's ~53 columns this needed to scroll horizontally on
+     its own so it wouldn't force the page itself to overflow at narrow
+     widths. Trimmed to 13 columns (last ~3 months, see WINDOW_WEEKS in
+     src/lib/contributions.ts) the whole grid comfortably fits inside the
+     content column at every supported viewport, so there is nothing here
+     that ever scrolls — no overflow-x container needed. Cell size below is
+     sized up from the year view's 10px/9px (where dense packing mattered)
+     since a 13-column grid at that size would look sparse in a 680px
+     column; this keeps it reading as a deliberate, evenly proportioned
+     widget rather than a shrunken version of the old chart.
+  */
   .contrib-wrap {
-    overflow-x: auto;
     padding-bottom: 2px;
   }
   .contrib-grid {
     display: grid;
     grid-auto-flow: column;
-    grid-template-rows: repeat(7, 10px);
-    grid-auto-columns: 10px;
-    gap: 3px;
+    grid-template-rows: repeat(7, 16px);
+    grid-auto-columns: 16px;
+    gap: 4px;
     width: max-content;
   }
   .contrib-grid :global(.contrib-cell) {
     display: block;
-    width: 10px;
-    height: 10px;
-    border-radius: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
     background: var(--cellEmpty);
   }
 
   @media (max-width: 640px) {
     .contrib-grid {
-      grid-template-rows: repeat(7, 9px);
-      grid-auto-columns: 9px;
-      gap: 2.5px;
+      grid-template-rows: repeat(7, 13px);
+      grid-auto-columns: 13px;
+      gap: 3px;
     }
     .contrib-grid :global(.contrib-cell) {
-      width: 9px;
-      height: 9px;
+      width: 13px;
+      height: 13px;
     }
   }
 </style>

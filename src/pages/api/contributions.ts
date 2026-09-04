@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
-import { fetchContributions, type ContributionDay } from '../../lib/contributions';
+import { fetchContributions, lastNWeeks, type ContributionDay } from '../../lib/contributions';
 
 export const prerender = false;
 
@@ -45,21 +45,26 @@ export const GET: APIRoute = async () => {
   }
 
   if (cached && isFresh(cached)) {
-    return jsonResponse(cached.days);
+    return jsonResponse(lastNWeeks(cached.days));
   }
 
   try {
+    // Cache the full year, same as before — that's the only shape GitHub's
+    // endpoint returns, and keeping the whole year in KV means the response
+    // window (last 13 weeks) can be recomputed on every read below without
+    // a re-fetch, staying correct as "today" moves from one day to the
+    // next between GitHub fetches.
     const days = await fetchContributions();
     const payload: CachedPayload = { days, updatedAt: Date.now() };
     await env.USAGE.put(KV_KEY, JSON.stringify(payload));
-    return jsonResponse(days);
+    return jsonResponse(lastNWeeks(days));
   } catch {
     // GitHub fetch failed (rate limit, outage, markup drift). Serve
     // whatever is cached, however stale, rather than error — the client
     // island degrades further by simply not rendering the section if this
     // comes back empty. Numbers are never fabricated here: this path only
     // ever returns previously-parsed real data or nothing at all.
-    if (cached) return jsonResponse(cached.days);
+    if (cached) return jsonResponse(lastNWeeks(cached.days));
     return jsonResponse([]);
   }
 };

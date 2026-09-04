@@ -1,0 +1,33 @@
+# crawl everything. cloudflare's managed robots.txt used to block ai
+# crawlers here by default; that's turned off now, on purpose — ai
+# crawlers and assistants are explicitly welcome, same as any other bot.
+
+User-agent: *
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Bytespider
+Allow: /

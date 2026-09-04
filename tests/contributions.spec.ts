@@ -1,5 +1,18 @@
 import { test, expect } from '@playwright/test';
-import { parseContributionsHtml } from '../src/lib/contributions';
+import { parseContributionsHtml, lastNWeeks, type ContributionDay } from '../src/lib/contributions';
+
+// A full year of days (like GitHub's fragment actually returns), one entry
+// per date, all level 0 — only the dates matter for these slicing tests.
+function fullYear(endingOn: string): ContributionDay[] {
+  const end = new Date(`${endingOn}T00:00:00Z`);
+  const days: ContributionDay[] = [];
+  for (let i = 0; i < 365; i++) {
+    const d = new Date(end);
+    d.setUTCDate(d.getUTCDate() - i);
+    days.push({ date: d.toISOString().slice(0, 10), count: 0, level: 0 });
+  }
+  return days.reverse();
+}
 
 // A trimmed stand-in for the real markup at
 // https://github.com/users/hirashif/contributions (confirmed by curling it
@@ -39,16 +52,58 @@ test.describe('parseContributionsHtml', () => {
   });
 });
 
+test.describe('lastNWeeks', () => {
+  // 13 weeks = the last full Sunday-Saturday week containing the most
+  // recent day, plus the 12 before it. The final week is only ever partial
+  // (through "today"), so the exact count varies with the weekday of the
+  // most recent day (85-91 days), but it's always a whole number of weeks
+  // back from a Sunday boundary — asserted below directly.
+  const days = fullYear('2026-09-04'); // a Friday
+
+  test('trims a full year down to a ~13-week window ending on the last day', () => {
+    const trimmed = lastNWeeks(days);
+    expect(trimmed[trimmed.length - 1].date).toBe('2026-09-04');
+    expect(trimmed.length).toBeGreaterThanOrEqual(85);
+    expect(trimmed.length).toBeLessThanOrEqual(91);
+  });
+
+  test('keeps whole weeks: the window starts on a Sunday', () => {
+    const trimmed = lastNWeeks(days);
+    const start = new Date(`${trimmed[0].date}T00:00:00Z`);
+    expect(start.getUTCDay()).toBe(0);
+  });
+
+  test('is a no-op on an already-empty list', () => {
+    expect(lastNWeeks([])).toEqual([]);
+  });
+
+  test('does not mutate its input or depend on input order', () => {
+    const shuffled = [...days].reverse();
+    const trimmed = lastNWeeks(shuffled);
+    expect(shuffled[0].date).toBe(days[days.length - 1].date); // untouched
+    expect(trimmed[trimmed.length - 1].date).toBe('2026-09-04');
+  });
+});
+
 test.describe('GET /api/contributions', () => {
-  test('returns an array of {date, count, level} entries', async ({ request }) => {
+  test('returns an array of {date, count, level} entries trimmed to roughly the last 3 months', async ({
+    request,
+  }) => {
     const res = await request.get('/api/contributions');
     expect(res.status()).toBe(200);
     const body = await res.json();
     expect(Array.isArray(body)).toBe(true);
     // A live fetch to GitHub can fail in a sandboxed/offline test
     // environment; the route's documented degrade path for that is an
-    // empty array (never fabricated data), so only assert per-entry shape
-    // when there's something to check.
+    // empty array (never fabricated data), so only assert shape when
+    // there's something to check.
+    if (body.length > 0) {
+      // 13 weeks, last one partial — a sensible range rather than an exact
+      // count, since the exact number drifts with today's weekday. Never
+      // the ~365 days the old full-year view rendered.
+      expect(body.length).toBeGreaterThanOrEqual(80);
+      expect(body.length).toBeLessThanOrEqual(100);
+    }
     for (const day of body.slice(0, 10)) {
       expect(typeof day.date).toBe('string');
       expect(day.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);

@@ -54,6 +54,33 @@ export function parseContributionsHtml(html: string): ContributionDay[] {
     .sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
 }
 
+// The home page only wants "the last 3 months", not the full year GitHub's
+// fragment returns. 13 weeks (~91 days) is the closest whole-week
+// approximation of 3 months. We keep caching the full year (see
+// api/contributions.ts) and slice down to this window on every read instead
+// of trimming what's fetched or stored, so the cached payload stays valid
+// as today rolls from one day into the next — no need to re-fetch just
+// because the window's start date moved.
+export const WINDOW_WEEKS = 13;
+
+// Slices to the last `weeks` calendar weeks (Sunday-Saturday), ending with
+// the week containing the most recent day in `days`. Cutting on a week
+// boundary (rather than a flat "last 91 days") keeps the grid's
+// week-per-column structure intact — the caller pads the result out to a
+// full Sunday-Saturday rectangle, so slicing on a week start means that pad
+// step doesn't need to invent extra days before the window.
+export function lastNWeeks(days: ContributionDay[], weeks: number = WINDOW_WEEKS): ContributionDay[] {
+  if (days.length === 0) return days;
+  const sorted = [...days].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+  const last = new Date(`${sorted[sorted.length - 1].date}T00:00:00Z`);
+  const lastWeekStart = new Date(last);
+  lastWeekStart.setUTCDate(lastWeekStart.getUTCDate() - lastWeekStart.getUTCDay());
+  const windowStart = new Date(lastWeekStart);
+  windowStart.setUTCDate(windowStart.getUTCDate() - (weeks - 1) * 7);
+  const startIso = windowStart.toISOString().slice(0, 10);
+  return sorted.filter((d) => d.date >= startIso);
+}
+
 export async function fetchContributions(username: string = DEFAULT_USER): Promise<ContributionDay[]> {
   const res = await fetch(`https://github.com/users/${username}/contributions`, {
     headers: {
