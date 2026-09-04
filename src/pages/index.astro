@@ -9,12 +9,9 @@ import TokenFooter from '../components/TokenFooter.astro';
 import { learnings } from '../content/learnings';
 import { projects } from '../content/projects';
 import { getCollection } from 'astro:content';
+import { fmtDate } from '../lib/date';
 
 const learnedPreview = learnings.slice(0, 3);
-
-function fmtDate(d: Date): string {
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }).toLowerCase();
-}
 
 const posts = (await getCollection('writing'))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())

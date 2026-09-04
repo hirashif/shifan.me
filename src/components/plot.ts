@@ -1,4 +1,5 @@
 import { PALETTE, cellToCoord } from '../lib/coords';
+import { fmtDate as fmtDateBase } from '../lib/date';
 
 interface PlotCell {
   cell: number;
@@ -15,8 +16,13 @@ interface PlotResponse {
 
 const PALETTE_SET: readonly string[] = PALETTE;
 
+// Previously omitted `timeZone: 'UTC'`, so a claim's date rendered here
+// used the viewer's local timezone while every other date on the site
+// (writing posts, via src/lib/date.ts) rendered in UTC — the same
+// `created_at` timestamp could print a different day depending on where it
+// was viewed from. Delegating to the shared formatter fixes that.
 function fmtDate(ms: number): string {
-  return new Date(ms).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toLowerCase();
+  return fmtDateBase(new Date(ms));
 }
 
 function safeColor(color: string): string {
