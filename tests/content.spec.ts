@@ -2,8 +2,8 @@ import { test, expect } from '@playwright/test';
 import { learnings } from '../src/content/learnings';
 import { work } from '../src/content/work';
 
-test('learnings is exactly 25', () => {
-  expect(learnings).toHaveLength(25);
+test('learnings is exactly 15', () => {
+  expect(learnings).toHaveLength(15);
 });
 
 test('at most one work row is current', () => {

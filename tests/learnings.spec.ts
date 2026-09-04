@@ -1,10 +1,9 @@
 import { test, expect } from '@playwright/test';
 
-test('renders exactly 25 numbered learnings', async ({ page }) => {
+test('renders exactly 15 learnings, unnumbered', async ({ page }) => {
   await page.goto('/learnings');
-  await expect(page.locator('[data-learning]')).toHaveCount(25);
-  await expect(page.locator('[data-learning-num]').first()).toHaveText('01');
-  await expect(page.locator('[data-learning-num]').last()).toHaveText('25');
+  await expect(page.locator('[data-learning]')).toHaveCount(15);
+  await expect(page.locator('[data-learning-num]')).toHaveCount(0);
 });
 
 test('has no filters, dates, or tags', async ({ page }) => {

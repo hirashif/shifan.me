@@ -8,7 +8,7 @@ A small, fast, mostly-static personal site with a few live bits:
 
 - **/** — home. name (scramble-in), one-line tagline, live uptime counter (years since 2002-11-26, 9 decimals), work timeline, "a few things i've learned" teaser (3 lines, links to /learnings), writing list (7 latest), projects grid, **the plot** (pixel guestbook, 40×10), clickable stack chips, footer with live token spend.
 - **/writing** — long-form posts. tag filter. markdown/MDX source.
-- **/learnings** — exactly 25 one-liners, numbered 01–25. no dates, no tags, no filters. when a new one is added, an old one is removed. mix of life and work.
+- **/learnings** — exactly 15 one-liners. no dates, no tags, no filters. when a new one is added, an old one is removed. mix of life and work.
 - **/plot** — the full pixel guestbook + recent claims list.
 
 Floating dock at the bottom on every page: home · writing · learnings · plot · | · github · linkedin · email (copies to clipboard, "copied" bubble) · theme (sun/moon).
@@ -25,7 +25,7 @@ Floating dock at the bottom on every page: home · writing · learnings · plot 
 - **One accent: yellow `#e8b04b`.** No other accent colors except the plot palette. Light-mode text-on-light uses `#8a6100` for contrast.
 - **Dark and light are equal citizens.** Every new element must use the CSS variables below, never hardcoded fg/bg.
 - **Boring is the point.** No gradients, no cards-with-left-borders, no emoji, no marketing copy. If it feels like a landing page, undo it.
-- **Learnings is capped at 25.** Enforce in code (build fails or test fails if length ≠ 25).
+- **Learnings is capped at 15.** Enforce in code (build fails or test fails if length ≠ 15).
 - Keep pages count small. Don't add a page unless shifan asks. Fold new content into home or writing first.
 
 ## Design reference
@@ -56,7 +56,7 @@ Keyboard: `t` toggles theme, `g` jumps to the plot. Ignore when focus is in an i
 - **Astro** (static-first, islands for the interactive bits) **or Next.js app router**. Prefer Astro unless the plot's auth pushes toward Next. Either way: TypeScript, Tailwind v4 with the tokens above as CSS variables (`@theme`), no component library — the design is ~12 primitives and a library would fight the look.
 - **Fonts:** `geist` npm package (Geist + Geist Mono), self-hosted. No Google Fonts at runtime.
 - **Icons:** dock icons are inline SVGs in the design (copy them). Stack chip icons from `simple-icons` package, rendered as inline SVG at build time — not hotlinked from a CDN.
-- **Content:** `content/learnings.ts` (array of 25 strings), `content/writing/*.mdx`, `content/projects.ts`, `content/work.ts`. Frontmatter for posts: `title, date, tag, minutes, excerpt`.
+- **Content:** `content/learnings.ts` (array of 15 strings), `content/writing/*.mdx`, `content/projects.ts`, `content/work.ts`. Frontmatter for posts: `title, date, tag, minutes, excerpt`.
 - **Theme:** class on `<html>` (`dark`/`light`), persisted in `localStorage['shifan-theme']`, read before first paint via inline script to avoid flash. Default dark.
 - **The plot:** needs a backend. `plot` table: `cell int pk (0–399), user_id, name, msg (≤120 chars), color (one of palette), created_at`. One row per github user (unique on user_id). Auth: GitHub OAuth (Auth.js or Clerk). API: `GET /api/plot` (all cells), `POST /api/plot` (claim; rejects if user already has one or cell taken). Hover tooltip shows msg · name · date · coord. Coord = row letter a–j + column 1–40.
 - **Token spend:** `GET /api/tokens` returns `{ today, week, year, tokensToday }` in USD from the Anthropic usage/cost API (or a cron that writes to a KV). Cache 5 minutes. Footer shows today; hover card shows all four. Never expose the API key client-side.
@@ -67,7 +67,7 @@ Keyboard: `t` toggles theme, `g` jumps to the plot. Ignore when focus is in an i
 ## Frontend tooling Claude Code should use
 
 - `pnpm`. Scripts: `dev`, `build`, `preview`, `lint` (eslint + prettier), `typecheck`, `test`.
-- **Playwright** for the handful of things that matter: no "hirani" in rendered HTML, learnings count = 25, theme toggle flips class + persists, plot claim flow, `t`/`g` shortcuts, no console errors on each route.
+- **Playwright** for the handful of things that matter: no "hirani" in rendered HTML, learnings count = 15, theme toggle flips class + persists, plot claim flow, `t`/`g` shortcuts, no console errors on each route.
 - **Lighthouse CI** budget: perf ≥ 95, a11y ≥ 95. Dock buttons need `aria-label`s (the visual tooltip is not enough).
 - Use `astro check` / `tsc --noEmit` before every commit.
 - For visual diffs against the prototypes, screenshot the `.dc.html` files in `design_handoff/` at 940px wide and compare side by side.
@@ -77,7 +77,7 @@ Keyboard: `t` toggles theme, `g` jumps to the plot. Ignore when focus is in an i
 Shifan will provide his resume and LinkedIn. Use them to replace placeholders:
 - work timeline dates + descriptions (paycom dates, university name/degree/years — currently `your university`, `20xx`)
 - project descriptions (current ones are inferred from repos — verify)
-- learnings (current 25 are drafts in his voice — he will rewrite)
+- learnings (current 15 are drafts in his voice — he will rewrite)
 - the name tooltip copy ("from the arabic shifā, 'healing'. my mom picked it…") — confirm wording
 - writing posts (titles exist on the old site; bodies need migrating from hirashif.github.io/writeups)
 

@@ -7,17 +7,16 @@ import { learnings } from '../content/learnings';
 
   <header class="fade-up">
     <h1>things i've learned</h1>
-    <p class="sub">twenty-five. one line each. when i learn a new one, an old one has to go.</p>
+    <p class="sub">fifteen. one line each. when i learn a new one, an old one has to go.</p>
   </header>
 
-  <ol class="list fade-up" style="animation-delay:100ms">
-    {learnings.map((text, i) => (
+  <ul class="list fade-up" style="animation-delay:100ms">
+    {learnings.map((text) => (
       <li data-learning>
-        <span data-learning-num class="mono num">{String(i + 1).padStart(2, '0')}</span>
         <span class="text">{text}</span>
       </li>
     ))}
-  </ol>
+  </ul>
 </Base>
 
 <style>
@@ -59,16 +58,9 @@ import { learnings } from '../content/learnings';
     flex-direction: column;
   }
   .list li {
-    display: grid;
-    grid-template-columns: 36px 1fr;
-    gap: 14px;
-    align-items: baseline;
+    display: block;
     padding: 13px 0;
     border-top: 1px solid var(--line);
-  }
-  .num {
-    font-size: 12px;
-    color: var(--accText);
   }
   .text {
     font-size: 16px;
