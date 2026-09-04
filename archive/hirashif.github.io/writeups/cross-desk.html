@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Why the Cross Desk has nothing real-time in it · Shifan Hirani</title>
+  <meta name="description" content="Product decisions in The Cross Desk: zero intraday LLM calls, the licensing boundary, and the Numbers Rule validator.">
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%230C1117"/><text x="12" y="44" font-family="monospace" font-size="30" fill="%2353D08A">&gt;_</text></svg>'>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="page">
+
+<header class="menubar">
+  <div class="menubar-left">
+    <a class="menubar-item" href="../index.html" style="font-weight: 700; color: var(--ink);">shifan</a>
+    <span class="menubar-item" style="cursor: default;">writeups</span>
+  </div>
+  <span class="menubar-clock" id="clock" aria-hidden="true"></span>
+</header>
+
+<div class="doc-wrap">
+  <article class="window doc-window placed">
+    <div class="titlebar" style="cursor: default;">
+      <span class="lights"><a class="light red" href="../index.html" aria-label="Back to desktop"></a><span class="light yellow"></span><span class="light green"></span></span>
+      <span class="titlebar-title mono">cross-desk.md</span>
+    </div>
+    <div class="doc-body">
+      <h1>Why the Cross Desk has nothing real-time in it</h1>
+      <div class="doc-meta">THE CROSS DESK · TYPESCRIPT · NEXT.JS · <a href="https://thecrossdesk.com">THECROSSDESK.COM</a> · LAUNCHING SOON</div>
+
+      <p>The Cross Desk is four AI analysts that hold a morning meeting at 8:00 central over real options data, then publish a desk brief. Subscribers replay the meeting through the day. Nothing runs intraday. Zero LLM calls between the open and the close, and that was the first real product decision I made on it.</p>
+
+      <p>Cost is the obvious reason. Batch generation runs about $0.10 per user per day against a $15 a month subscription, and regenerating on every market move would multiply that by the length of the session.</p>
+
+      <p>Licensing is the bigger one. Exchanges treat real-time display of market data and delayed derived commentary as different products with different obligations, which means a brief generated once each morning is something one person can actually license and ship. A live feed of AI commentary racing the tape is not. So I built the version I could ship.</p>
+
+      <p>The other thing worth writing down is the Numbers Rule. All the chain math is computed in TypeScript first: gamma exposure, the flip point, walls, expected move, ATR, relative volume. The analysts write from those figures. Then a validator pulls every number back out of the generated text, checks it against the computed value, and regenerates the whole turn on any mismatch. It earned its keep early. It caught an analyst rounding 83.97% to "80%" because the sentence read better. Language models round numbers to make sentences flow, so every figure gets checked before it ships.</p>
+
+      <a class="doc-back" href="../index.html">← back to the desktop</a>
+    </div>
+  </article>
+</div>
+
+<script src="../js/desktop.js"></script>
+</body>
+</html>

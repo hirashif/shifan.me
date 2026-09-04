@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ordering without global order · Shifan Hirani</title>
+  <meta name="description" content="Design decisions in crypto-market-pipeline: Kafka partitioning by symbol, at-least-once delivery made safe, and what broke on a real AKS cluster.">
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%230C1117"/><text x="12" y="44" font-family="monospace" font-size="30" fill="%2353D08A">&gt;_</text></svg>'>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="page">
+
+<header class="menubar">
+  <div class="menubar-left">
+    <a class="menubar-item" href="../index.html" style="font-weight: 700; color: var(--ink);">shifan</a>
+    <span class="menubar-item" style="cursor: default;">writeups</span>
+  </div>
+  <span class="menubar-clock" id="clock" aria-hidden="true"></span>
+</header>
+
+<div class="doc-wrap">
+  <article class="window doc-window placed">
+    <div class="titlebar" style="cursor: default;">
+      <span class="lights"><a class="light red" href="../index.html" aria-label="Back to desktop"></a><span class="light yellow"></span><span class="light green"></span></span>
+      <span class="titlebar-title mono">ordering.md</span>
+    </div>
+    <div class="doc-body">
+      <h1>Ordering without global order</h1>
+      <div class="doc-meta">CRYPTO-MARKET-PIPELINE · GO · KAFKA · REDIS · AZURE AKS · <a href="https://github.com/hirashif/crypto-market-pipeline">REPO</a></div>
+
+      <p>crypto-market-pipeline is three Go services: an ingester pulling exchange prices, a processor, and a REST API, connected by Kafka with Redis as the hot store. I built it in two days to close the cloud gap on my resume, then spent longer getting it to behave on a real Azure AKS cluster than I spent writing it.</p>
+
+      <p>The decision that shaped everything else is the partitioning. Prices are partitioned by symbol, so BTC-USD lands on one partition and ETH-USD on another. Kafka guarantees order within a partition, which means every consumer sees each symbol's ticks in sequence. That is the only ordering a price feed needs, so it is the only ordering I kept. Global order across symbols is gone, and I gave it up on purpose, because nothing downstream ever compares a BTC tick to an ETH tick by arrival time.</p>
+
+      <p>Delivery is at-least-once. When the processor restarts mid-batch, some messages come around again. Instead of chasing exactly-once semantics, the Redis write is an idempotent <code>HSET</code> keyed on symbol. Applying the same tick twice leaves the same state. History can hold duplicates, which is a tradeoff I accepted and wrote down, with dedupe on sequence id as the fix if it ever matters.</p>
+
+      <p>What broke, in the order it broke:</p>
+
+      <ul>
+        <li>The first VM size I picked could not schedule the pods. Kubernetes reserves a chunk of each node for itself, which I knew as a fact and not as a bill until then.</li>
+        <li>My images were arm64, because I built them on an M-series Mac. The AKS nodes are amd64. Everything built and pushed cleanly. Then it crash-looped in the cluster.</li>
+        <li>Rolling restarts dropped in-flight messages. The processor died on SIGTERM without draining, so deploys quietly ate data. It now stops consuming on the signal, finishes its batch, commits, and exits.</li>
+        <li>During an exchange outage my reconnect loop hammered their API at full speed. Backoff with jitter went in the same night.</li>
+      </ul>
+
+      <p>The repo has the Terraform, the GitHub Actions pipeline, and a README that covers most of this.</p>
+
+      <a class="doc-back" href="../index.html">← back to the desktop</a>
+    </div>
+  </article>
+</div>
+
+<script src="../js/desktop.js"></script>
+</body>
+</html>

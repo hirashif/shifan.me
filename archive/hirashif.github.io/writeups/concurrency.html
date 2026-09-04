@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Concurrency in practice · Shifan Hirani</title>
+  <meta name="description" content="Row locks, partitions, idempotent writes, and bounded queues: the invariant picks the tool.">
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%230C1117"/><text x="12" y="44" font-family="monospace" font-size="30" fill="%2353D08A">&gt;_</text></svg>'>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="page">
+
+<header class="menubar">
+  <div class="menubar-left">
+    <a class="menubar-item" href="../index.html" style="font-weight: 700; color: var(--ink);">shifan</a>
+    <span class="menubar-item" style="cursor: default;">writeups</span>
+  </div>
+  <span class="menubar-clock" id="clock" aria-hidden="true"></span>
+</header>
+
+<div class="doc-wrap">
+  <article class="window doc-window placed">
+    <div class="titlebar" style="cursor: default;">
+      <span class="lights"><a class="light red" href="../index.html" aria-label="Back to desktop"></a><span class="light yellow"></span><span class="light green"></span></span>
+      <span class="titlebar-title mono">concurrency.md</span>
+    </div>
+    <div class="doc-body">
+      <h1>Concurrency in practice</h1>
+      <div class="doc-meta">ESSAY · AUGUST 2026</div>
+
+      <p>Every concurrency bug I have chased came down to the same question. What invariant needs protecting, and what is the cheapest mechanism that protects it?</p>
+
+      <p>Take a payments table. The invariant is that debits equal credits and no account goes below its floor, and the dangerous case is two transfers touching the same accounts at once. The classic protection is pessimistic: SELECT FOR UPDATE on both account rows, always locked in a fixed order. Concurrent transfers either queue cleanly or run independently. The fixed order is what makes deadlock impossible, since no two transactions can ever hold pieces of each other's lock set. The alternative is optimistic concurrency, a version column checked at commit. Optimistic wins when conflicts are rare. Money breaks that assumption. Payment workloads have hot rows, one busy account hit constantly, and under real contention optimistic retries snowball into a storm of replayed transactions. Waiting a few milliseconds on a lock is cheaper than replaying work.</p>
+
+      <p>A price feed protects a different invariant, which is that each symbol's ticks apply in order. You can protect it with no locks at all. Partition the stream by symbol, the way Kafka does, and two symbols never contend while each partition serializes its own updates. That is concurrency by isolation rather than by locking, and it is the cheapest mechanism on this list when your invariant is per-key ordering. The catch is delivery. Streams give you at-least-once, so the same message will eventually arrive twice, and the write on the far end has to be idempotent, landing on the same state no matter how many times it applies.</p>
+
+      <p>Overload is the third shape. A batch job that fans out unbounded work will hang the moment traffic outgrows it, and the fix is rarely clever. Chunk the work, bound what is in flight, and keep headroom instead of running the pipe at its ceiling. Backpressure is a concurrency mechanism too, just one that protects the invariant "this system stays up".</p>
+
+      <p>Locks, partitions, idempotent writes, and bounded queues are not competing philosophies. They are tools, and the invariant picks the tool. Most of the concurrency bugs I have seen came from someone adding mechanism without naming the invariant first.</p>
+      <a class="doc-back" href="../index.html">&larr; back to the desktop</a>
+    </div>
+  </article>
+</div>
+
+<script src="../js/desktop.js"></script>
+</body>
+</html>

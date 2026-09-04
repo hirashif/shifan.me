@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agentic payments · Shifan Hirani</title>
+  <meta name="description" content="Why AI agents break the assumptions payment rails were built on: authorization, economics, and retries.">
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%230C1117"/><text x="12" y="44" font-family="monospace" font-size="30" fill="%2353D08A">&gt;_</text></svg>'>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="page">
+
+<header class="menubar">
+  <div class="menubar-left">
+    <a class="menubar-item" href="../index.html" style="font-weight: 700; color: var(--ink);">shifan</a>
+    <span class="menubar-item" style="cursor: default;">writeups</span>
+  </div>
+  <span class="menubar-clock" id="clock" aria-hidden="true"></span>
+</header>
+
+<div class="doc-wrap">
+  <article class="window doc-window placed">
+    <div class="titlebar" style="cursor: default;">
+      <span class="lights"><a class="light red" href="../index.html" aria-label="Back to desktop"></a><span class="light yellow"></span><span class="light green"></span></span>
+      <span class="titlebar-title mono">agentic-payments.md</span>
+    </div>
+    <div class="doc-body">
+      <h1>Agentic payments</h1>
+      <div class="doc-meta">ESSAY · AUGUST 2026</div>
+
+      <p>AI agents are starting to spend money. They book tables, renew subscriptions, buy compute, and pay other agents for API calls. Every payment rail they touch was designed on one assumption: a human is present at the moment of purchase. That assumption just broke.</p>
+
+      <p>Start with authorization. Card security is built around proving the cardholder was there. CVV, 3-D Secure, the liability rules behind every chargeback. With an agent the human decision happened earlier, back when the instruction was given. "Book me a flight under $400" is the authorization. The purchase itself happens hours later, against a merchant the user never saw. When it goes wrong, the dispute question changes from "did you click buy" to "did your agent stay inside the instruction you gave it", and card networks have no native way to answer that.</p>
+
+      <p>Then the economics. A card transaction carries a fixed fee around 30 cents. Fine for a $60 checkout. Absurd for an agent paying a tenth of a cent per API call. Machine-to-machine spending wants payments the size of a request, settled in seconds, with no signup flow, and that is a different rail entirely.</p>
+
+      <p>The part nobody markets is retries. An agent that hits a timeout does what all well-built clients do, it tries again, except this client holds a wallet and can convince itself the first attempt never happened. Payment systems handle this with idempotency keys: the client attaches a unique key to the request, and the server returns the original result on a replay instead of moving money twice. That machinery is table stakes for human-initiated payments. For agent-initiated payments it is the whole game, along with budgets, merchant allowlists, and receipts that reconcile against a real bank statement. None of the new protocols own that layer yet.</p>
+
+      <p>Two camps are forming around the rails themselves. Card networks and Google are extending the existing system with signed mandates, so the human's instruction becomes a verifiable artifact a dispute can point at. Coinbase and Cloudflare built a new rail where the payment travels inside the HTTP request itself. <a href="ap2-x402.html">The next writeup covers both</a>.</p>
+      <a class="doc-back" href="../index.html">&larr; back to the desktop</a>
+    </div>
+  </article>
+</div>
+
+<script src="../js/desktop.js"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Finding the bug that let a $70 account send $500 · Shifan Hirani</title>
+  <meta name="description" content="A writeup on the ledger project: double-entry on Postgres, idempotent transfers, and the solvency check that turned out to be dead code.">
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%230C1117"/><text x="12" y="44" font-family="monospace" font-size="30" fill="%2353D08A">&gt;_</text></svg>'>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="page">
+
+<header class="menubar">
+  <div class="menubar-left">
+    <a class="menubar-item" href="../index.html" style="font-weight: 700; color: var(--ink);">shifan</a>
+    <span class="menubar-item" style="cursor: default;">writeups</span>
+  </div>
+  <span class="menubar-clock" id="clock" aria-hidden="true"></span>
+</header>
+
+<div class="doc-wrap">
+  <article class="window doc-window placed">
+    <div class="titlebar" style="cursor: default;">
+      <span class="lights"><a class="light red" href="../index.html" aria-label="Back to desktop"></a><span class="light yellow"></span><span class="light green"></span></span>
+      <span class="titlebar-title mono">ledger-bug.md</span>
+    </div>
+    <div class="doc-body">
+      <h1>Finding the bug that let a $70 account send $500</h1>
+      <div class="doc-meta">LEDGER · JAVA · SPRING BOOT · POSTGRES · <a href="https://github.com/hirashif/ledger">REPO</a> · <a href="https://ledger-75986543116.us-central1.run.app/swagger-ui/index.html">LIVE API</a></div>
+
+      <p>The ledger is a weekend project. Double-entry bookkeeping on Postgres, a transfers API in Spring Boot, and a reconciliation endpoint that proves every balance nets to zero. I built it because I kept talking about payment systems in interviews and wanted to have actually written one.</p>
+
+      <p>The design is deliberately boring. Every transfer writes two rows inside one transaction, a debit and a credit. Both account rows get locked with <code>SELECT FOR UPDATE</code> in a fixed order so two concurrent transfers can never deadlock each other. The idempotency key is claimed before any business rule runs. Retry the same request and you get the original transaction back. Reuse the key with a different body and you get a 409, since that means the caller has a bug and a quiet 422 would hide it.</p>
+
+      <p>Then I found the bug. I was seeding demo data with curl and typoed an amount. An account holding $70 sent $500. The API said 201.</p>
+
+      <p>The solvency check existed. It had tests. They passed. The controller was calling a write method that skipped every check, so the guards were dead code on the real path. The tests never noticed, because they called the service layer directly, the one place the checks ran. The fix was small. The bigger change was to the tests, which now go through the HTTP endpoint the way a client would.</p>
+
+      <p>It runs live on Cloud Run against a free Neon Postgres, scale-to-zero. Cold start is about 3.3 seconds while the JVM wakes up from zero, warm requests come back in under 200ms, and the whole thing costs nothing to host. Seed data is loaded. You can replay the idempotency demo from the <a href="https://ledger-75986543116.us-central1.run.app/swagger-ui/index.html">Swagger page</a> and watch the same transactionId come back twice.</p>
+
+      <a class="doc-back" href="../index.html">← back to the desktop</a>
+    </div>
+  </article>
+</div>
+
+<script src="../js/desktop.js"></script>
+</body>
+</html>

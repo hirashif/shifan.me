@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What inference actually costs · Shifan Hirani</title>
+  <meta name="description" content="Scheduling, the output tax, provider spread, and paying to check outputs against computed truth.">
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%230C1117"/><text x="12" y="44" font-family="monospace" font-size="30" fill="%2353D08A">&gt;_</text></svg>'>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="page">
+
+<header class="menubar">
+  <div class="menubar-left">
+    <a class="menubar-item" href="../index.html" style="font-weight: 700; color: var(--ink);">shifan</a>
+    <span class="menubar-item" style="cursor: default;">writeups</span>
+  </div>
+  <span class="menubar-clock" id="clock" aria-hidden="true"></span>
+</header>
+
+<div class="doc-wrap">
+  <article class="window doc-window placed">
+    <div class="titlebar" style="cursor: default;">
+      <span class="lights"><a class="light red" href="../index.html" aria-label="Back to desktop"></a><span class="light yellow"></span><span class="light green"></span></span>
+      <span class="titlebar-title mono">inference.md</span>
+    </div>
+    <div class="doc-body">
+      <h1>What inference actually costs</h1>
+      <div class="doc-meta">ESSAY · AUGUST 2026</div>
+
+      <p>Inference is a metered utility, and most teams find that out on the first real bill. The numbers that matter are boring: what a generation costs, how often you run one, and whether anyone needed it to be fresh.</p>
+
+      <p>The biggest lever is scheduling. A generation that runs once and gets replayed to every reader costs a fixed amount per day. The same generation triggered on every event costs whatever the event rate says it costs, and you no longer control the bill. The gap between those two modes is often a hundredfold. Plenty of products that ask for a real-time LLM feature actually want a scheduled one with good replay, because the reader arrives hours after the generation anyway.</p>
+
+      <p>The second lever is the output tax. Providers price output tokens at a multiple of input tokens, so a system that produces long generations from short prompts has the worst possible cost shape. Caching flips it. Prompt caching makes repeated context nearly free, which rewards architectures that hold context stable and vary only the small final question.</p>
+
+      <p>Third, providers are not interchangeable, and the spread is bigger than the marketing suggests. Run one prompt across a dozen models and latency varies by an order of magnitude, pricing varies more, and the quality ranking flips depending on the task. The practical conclusion is structural: model choice belongs in config, not in architecture, so that switching providers is an edit and not a rewrite.</p>
+
+      <p>The last cost is the one worth paying. Language models round numbers to make sentences flow. Ask one to narrate figures it was handed and it will eventually turn 83.97% into "80%" because the sentence reads better. The fix is to compute every figure outside the model, pull each number back out of the generated text, and regenerate on any mismatch. Regeneration doubles the price of that turn. A reader who catches one wrong number stops trusting all of them, so the doubled turn is cheap.</p>
+
+      <p>None of this needs a GPU or a research paper. The wins are scheduling, caching, checking outputs against computed truth, and watching which meter is running.</p>
+      <a class="doc-back" href="../index.html">&larr; back to the desktop</a>
+    </div>
+  </article>
+</div>
+
+<script src="../js/desktop.js"></script>
+</body>
+</html>
