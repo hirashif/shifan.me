@@ -16,7 +16,11 @@ Floating dock at the bottom on every page: home · writing · learnings · plot 
 ## Hard rules (do not break these)
 
 - **Only "shifan".** The last name never appears anywhere on the site, in metadata, or in alt text. Email is fine.
-- **No resume link/page.** Work history lives in the timeline on home.
+- **No resume link/page in the site's navigation or content.** Work history lives in
+  the timeline on home. One deliberate exception, added at shifan's request: an
+  *unlisted* resume page at a high-entropy path (`/2v16erb7nu5o5c`), `noindex`, linked
+  from nowhere on the site and excluded from the sitemap. It exists so shifan can hand
+  the link out directly. Do not link to it, and do not delete it.
 - **lowercase everywhere.** copy, headings, nav, tooltips. brand names too (paycom, postgres). the only capitals are in code/badges like `LIVE`.
 - **One accent: yellow `#e8b04b`.** No other accent colors except the plot palette. Light-mode text-on-light uses `#8a6100` for contrast.
 - **Dark and light are equal citizens.** Every new element must use the CSS variables below, never hardcoded fg/bg.
