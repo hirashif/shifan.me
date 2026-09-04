@@ -8,12 +8,13 @@ export default defineConfig({
   adapter: cloudflare(),
   integrations: [mdx()],
   vite: { plugins: [tailwindcss()] },
-  // The resume lives at /resume-cifz9eqb: readable enough to paste into an
-  // email, with enough entropy in the suffix that it can't be enumerated.
-  // Keep this older high-entropy link working for anyone who already has it
-  // — it must point at the current path, not a bare /resume (see CLAUDE.md).
+  // The resume lives at /hereismyresume: a fully readable path with no
+  // random characters, chosen so it reads naturally when pasted into an
+  // email. Keep this older high-entropy link working for anyone who already
+  // has it — it must point at the current path, not a bare /resume (see
+  // CLAUDE.md).
   redirects: {
-    '/2v16erb7nu5o5c': '/resume-cifz9eqb',
+    '/2v16erb7nu5o5c': '/hereismyresume',
   },
   // The dev toolbar injects an audit overlay into every page (including an
   // extra <h1>) which is harmless by hand but flakes Playwright's strict

@@ -1,18 +1,19 @@
-# The resume lives at /resume-cifz9eqb (readable, but with enough entropy
-# in the suffix that it can't be enumerated or guessed — see CLAUDE.md).
-# A bare /resume must not exist or redirect anywhere. To keep the real path
-# out of search results anyway, every response for it carries X-Robots-Tag —
-# this is the only way to mark the PDF noindex, since a PDF can't carry a
-# <meta> tag. The HTML page also repeats this via a <meta name="robots">
-# tag in src/pages/resume-cifz9eqb.astro.
+# The resume lives at /hereismyresume: a fully readable path with no random
+# characters — obscurity, not access control, and not enumerated by a
+# scanner trying /resume, /cv, /about (see CLAUDE.md). A bare /resume must
+# not exist or redirect anywhere. To keep the real path out of search
+# results anyway, every response for it carries X-Robots-Tag — this is the
+# only way to mark the PDF noindex, since a PDF can't carry a <meta> tag.
+# The HTML page also repeats this via a <meta name="robots"> tag in
+# src/pages/hereismyresume.astro.
 #
 # NOTE: the @astrojs/cloudflare adapter injects its own immutable
 # Cache-Control block for /_astro/* at the top of this file during
 # `astro build` (see astro:build:done in @astrojs/cloudflare) — it prepends
 # rather than overwrites, so this file's own rules below are preserved as-is
 # on every build. Don't reorder this file expecting it to stay put.
-/resume-cifz9eqb
+/hereismyresume
   X-Robots-Tag: noindex, nofollow, noarchive, noai, noimageai
 
-/resume-cifz9eqb.pdf
+/hereismyresume.pdf
   X-Robots-Tag: noindex, nofollow, noarchive, noai, noimageai

@@ -4,8 +4,8 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const PAGE = '/resume-cifz9eqb';
-const PDF = '/resume-cifz9eqb.pdf';
+const PAGE = '/hereismyresume';
+const PDF = '/hereismyresume.pdf';
 const OLD_SECRET = '/2v16erb7nu5o5c';
 const GUESSABLE_PAGE = '/resume';
 const GUESSABLE_PDF = '/resume.pdf';
@@ -52,7 +52,7 @@ test('public/_headers sets X-Robots-Tag noindex on both the page and the pdf', (
 
 test('the old high-entropy path redirects to the current resume path', async ({ page }) => {
   await page.goto(OLD_SECRET);
-  await expect(page).toHaveURL(/\/resume-cifz9eqb\/?$/);
+  await expect(page).toHaveURL(/\/hereismyresume\/?$/);
 });
 
 // Regression guard: an earlier version of this site put the resume at the

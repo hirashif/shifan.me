@@ -18,24 +18,39 @@ Floating dock at the bottom on every page: home · writing · learnings · plot 
 - **Only "shifan".** The last name never appears anywhere on the site, in metadata, or in alt text. Email is fine.
 - **No resume link/page in the site's navigation or content.** Work history lives in
   the timeline on home. One deliberate exception, added at shifan's request: an
-  *unlisted* resume page at `/resume-cifz9eqb` (PDF at `/resume-cifz9eqb.pdf`). The
-  path keeps the word "resume" so it reads as what it is when pasted into an email,
-  plus a random suffix (~41 bits of entropy) so it cannot be found by guessing or by a
-  crawler enumerating common paths. A bare `/resume` was tried once and rejected:
-  shifan wants a link he can email but not one that's "the single most likely path
-  anyone would try." **`/resume` and `/resume.pdf` must not exist and must not
-  redirect anywhere** — not even to the real path — because a redirect from the
-  guessable path hands anyone enumerating it the real url and defeats the entire
-  point. Do not "tidy" this back to `/resume`. The old high-entropy path
-  `/2v16erb7nu5o5c` still 301-redirects to the current resume path (old links are out
-  in the wild, keep that redirect working) — if the resume path ever changes again,
-  update that redirect's target, don't remove it. It stays out of search two ways:
-  `<meta name="robots" content="noindex, nofollow">` on the page, and an
-  `X-Robots-Tag: noindex, nofollow, noarchive, noai, noimageai` response header on
-  both `/resume-cifz9eqb` and `/resume-cifz9eqb.pdf` via `public/_headers` (the header
-  is the only way to noindex the PDF itself — it can't carry a meta tag). It is still
-  linked from nowhere on the site and excluded from any sitemap. Do not link to it and
-  do not delete it.
+  *unlisted* resume page at `/hereismyresume` (PDF at `/hereismyresume.pdf`). This is
+  the final arrangement — it went through two rejected attempts (a guessable bare
+  `/resume`, then a random-suffixed `/resume-cifz9eqb` that "reads like malware in an
+  email") before landing here, so do not change the path or its shape again without
+  shifan asking.
+
+  The path is fully readable, with no random-looking characters — it reads naturally
+  pasted into an email ("here's my resume: shifan.me/hereismyresume") — and it is not
+  a path any scanner enumerates: vulnerability scanners and crawlers try `/resume`,
+  `/cv`, `/resume.pdf`, `/about`, not full phrases. **Be clear-eyed about what this
+  is: obscurity, not access control.** Anyone with the link can open it, and a
+  sufficiently determined person could guess the phrase. That is an accepted
+  tradeoff, correct for a resume shifan intends to hand out directly — it is not a
+  security boundary and must never be treated as one (no auth, no rate limiting, no
+  "make it more secure" beyond what's described here).
+
+  **`/resume` and `/resume.pdf` must not exist and must not redirect anywhere** — not
+  even to the real path — because a redirect from the guessable path hands anyone
+  enumerating it the real url and defeats the entire point. Do not "tidy" this back
+  to `/resume`; a plain, guessable path is the one shape this has to never take
+  again. The old high-entropy path `/2v16erb7nu5o5c` still 301-redirects to the
+  current resume path (old links are out in the wild, keep that redirect working) —
+  if the resume path ever changes again, update that redirect's target, don't remove
+  it. The since-abandoned `/resume-cifz9eqb` path has no redirect (it was never
+  shared, so there is nothing to preserve) and must not be reintroduced.
+
+  What actually keeps this out of search is **not** the path's obscurity — it's two
+  explicit signals, and both must stay: `<meta name="robots" content="noindex,
+  nofollow">` on the page, and an `X-Robots-Tag: noindex, nofollow, noarchive, noai,
+  noimageai` response header on both `/hereismyresume` and `/hereismyresume.pdf` via
+  `public/_headers` (the header is the only way to noindex the PDF itself — it can't
+  carry a meta tag). It is still linked from nowhere on the site and excluded from
+  any sitemap. Do not link to it and do not delete it.
 - **lowercase everywhere.** copy, headings, nav, tooltips. brand names too (paycom, postgres). the only capitals are in code/badges like `LIVE`. Approved exception: roman
   numerals in job titles, e.g. `software developer II` (see `src/content/work.ts`) — same
   spirit as the `LIVE`/`OSS` badge exception, not a loophole to generalize from.
