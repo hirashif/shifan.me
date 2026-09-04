@@ -8,7 +8,10 @@ export const prerender = false;
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
     status,
-    headers: { 'content-type': 'application/json' },
+    // GET's response body includes `mine`, which varies per visitor by
+    // session cookie. Without this, a shared/edge cache would be free to
+    // serve one visitor's `mine` value (which cell is theirs) to another.
+    headers: { 'content-type': 'application/json', 'cache-control': 'private, no-store' },
   });
 
 // The design calls `name`/`msg` "one line" and the plot UI (Task 10) renders
