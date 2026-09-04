@@ -54,14 +54,26 @@ export function parseContributionsHtml(html: string): ContributionDay[] {
     .sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
 }
 
-// The home page only wants "the last 3 months", not the full year GitHub's
-// fragment returns. 13 weeks (~91 days) is the closest whole-week
-// approximation of 3 months. We keep caching the full year (see
-// api/contributions.ts) and slice down to this window on every read instead
-// of trimming what's fetched or stored, so the cached payload stays valid
-// as today rolls from one day into the next — no need to re-fetch just
-// because the window's start date moved.
-export const WINDOW_WEEKS = 13;
+// The home page shows a trimmed window of the full year GitHub's fragment
+// returns, sized to fill the content column without looking sparse (see the
+// sizing comment in Contributions.astro). 26 weeks (~182 days, ~6 months)
+// is that size: the grid renders as `repeat(26, 1fr)` columns, so it always
+// fills exactly whatever width its container has. Measured directly (not
+// just estimated) at the site's own breakpoints: `<main>` is 680px
+// border-box with 40px side padding, so the desktop content area is
+// actually 600px, not 680 — at a 3px gap that's (600 - 25*3) / 26 ≈ 20px
+// square cells, filling the column edge to edge. At a 375px phone `<main>`
+// drops to 16px side padding (343px content area) and the grid's own
+// narrow-phone gap shrinks to 2px, giving (343 - 25*2) / 26 ≈ 11px cells —
+// still legible, and because the columns are fluid `1fr` tracks rather
+// than a fixed px size, this holds at every width in between too (e.g. the
+// 641-759px range where the outer column is still growing toward its cap),
+// not just at the two breakpoints checked here. We keep caching the full
+// year (see api/contributions.ts) and slice down to this window on every
+// read instead of trimming what's fetched or stored, so the cached payload
+// stays valid as today rolls from one day into the next — no need to
+// re-fetch just because the window's start date moved.
+export const WINDOW_WEEKS = 26;
 
 // Slices to the last `weeks` calendar weeks (Sunday-Saturday), ending with
 // the week containing the most recent day in `days`. Cutting on a week

@@ -31,3 +31,5 @@ Allow: /
 
 User-agent: Bytespider
 Allow: /
+
+Sitemap: https://shifan.me/sitemap-index.xml

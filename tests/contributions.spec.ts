@@ -53,18 +53,18 @@ test.describe('parseContributionsHtml', () => {
 });
 
 test.describe('lastNWeeks', () => {
-  // 13 weeks = the last full Sunday-Saturday week containing the most
-  // recent day, plus the 12 before it. The final week is only ever partial
+  // 26 weeks = the last full Sunday-Saturday week containing the most
+  // recent day, plus the 25 before it. The final week is only ever partial
   // (through "today"), so the exact count varies with the weekday of the
-  // most recent day (85-91 days), but it's always a whole number of weeks
+  // most recent day (176-182 days), but it's always a whole number of weeks
   // back from a Sunday boundary — asserted below directly.
   const days = fullYear('2026-09-04'); // a Friday
 
-  test('trims a full year down to a ~13-week window ending on the last day', () => {
+  test('trims a full year down to a ~26-week window ending on the last day', () => {
     const trimmed = lastNWeeks(days);
     expect(trimmed[trimmed.length - 1].date).toBe('2026-09-04');
-    expect(trimmed.length).toBeGreaterThanOrEqual(85);
-    expect(trimmed.length).toBeLessThanOrEqual(91);
+    expect(trimmed.length).toBeGreaterThanOrEqual(176);
+    expect(trimmed.length).toBeLessThanOrEqual(182);
   });
 
   test('keeps whole weeks: the window starts on a Sunday', () => {
@@ -86,7 +86,7 @@ test.describe('lastNWeeks', () => {
 });
 
 test.describe('GET /api/contributions', () => {
-  test('returns an array of {date, count, level} entries trimmed to roughly the last 3 months', async ({
+  test('returns an array of {date, count, level} entries trimmed to roughly the last 6 months', async ({
     request,
   }) => {
     const res = await request.get('/api/contributions');
@@ -98,11 +98,11 @@ test.describe('GET /api/contributions', () => {
     // empty array (never fabricated data), so only assert shape when
     // there's something to check.
     if (body.length > 0) {
-      // 13 weeks, last one partial — a sensible range rather than an exact
+      // 26 weeks, last one partial — a sensible range rather than an exact
       // count, since the exact number drifts with today's weekday. Never
       // the ~365 days the old full-year view rendered.
-      expect(body.length).toBeGreaterThanOrEqual(80);
-      expect(body.length).toBeLessThanOrEqual(100);
+      expect(body.length).toBeGreaterThanOrEqual(170);
+      expect(body.length).toBeLessThanOrEqual(190);
     }
     for (const day of body.slice(0, 10)) {
       expect(typeof day.date).toBe('string');

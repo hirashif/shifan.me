@@ -35,11 +35,20 @@ test.describe('GET /robots.txt', () => {
     expect(body).not.toContain('hereismyresume');
   });
 
-  test('does not point at a sitemap', async ({ request }) => {
-    // There is no sitemap.xml; a Sitemap: line pointing at a 404 would be
-    // worse than omitting it entirely.
+  test('points at the sitemap index', async ({ request }) => {
     const res = await request.get('/robots.txt');
     const body = await res.text();
-    expect(body).not.toMatch(/Sitemap:/i);
+    expect(body).toMatch(/^Sitemap:\s*https:\/\/shifan\.me\/sitemap-index\.xml\s*$/im);
+  });
+
+  // The sitemap line must never be the vehicle that publishes the unlisted
+  // resume path — same regression this file already guards against for
+  // the rest of robots.txt (see the test above).
+  test('the sitemap line does not mention the resume path', async ({ request }) => {
+    const res = await request.get('/robots.txt');
+    const body = await res.text();
+    const sitemapLine = body.split('\n').find((l) => /^Sitemap:/i.test(l.trim()));
+    expect(sitemapLine).toBeDefined();
+    expect(sitemapLine).not.toContain('hereismyresume');
   });
 });

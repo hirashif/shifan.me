@@ -8,18 +8,18 @@ const { delay = 80 } = Astro.props;
 // data has to come from /api/contributions at request time, via the client
 // script below, not from this frontmatter). So the grid ships with a blank
 // (level-0) placeholder shaped like the trimmed window the API now returns
-// — 13 weeks (last ~3 months), 7 rows — to reserve its footprint from first
+// — 26 weeks (last ~6 months), 7 rows — to reserve its footprint from first
 // paint. See WINDOW_WEEKS in src/lib/contributions.ts, which this mirrors;
 // kept as a literal here (Astro frontmatter is server-only and this file
 // has no other reason to import that module) rather than duplicated as a
 // shared import. The client script recolors these same nodes once real
-// data arrives; because the row count (7) and cell size are fixed by CSS,
-// swapping placeholder cells for real ones (even a week off in column
-// count) never changes the section's height, so it never shifts layout on
-// the common "it worked" path. Only the rare failure path (GitHub
+// data arrives; because the row count (7) and column count are fixed by
+// CSS, swapping placeholder cells for real ones (even a week off in column
+// count) never changes the section's footprint, so it never shifts layout
+// on the common "it worked" path. Only the rare failure path (GitHub
 // unreachable, empty response) collapses the section, which is the one
 // case where a shift is unavoidable.
-const PLACEHOLDER_WEEKS = 13;
+const PLACEHOLDER_WEEKS = 26;
 const placeholderCells = Array.from({ length: PLACEHOLDER_WEEKS * 7 });
 ---
 
@@ -46,14 +46,22 @@ const placeholderCells = Array.from({ length: PLACEHOLDER_WEEKS * 7 });
   }
   /* At the full year's ~53 columns this needed to scroll horizontally on
      its own so it wouldn't force the page itself to overflow at narrow
-     widths. Trimmed to 13 columns (last ~3 months, see WINDOW_WEEKS in
-     src/lib/contributions.ts) the whole grid comfortably fits inside the
-     content column at every supported viewport, so there is nothing here
-     that ever scrolls — no overflow-x container needed. Cell size below is
-     sized up from the year view's 10px/9px (where dense packing mattered)
-     since a 13-column grid at that size would look sparse in a 680px
-     column; this keeps it reading as a deliberate, evenly proportioned
-     widget rather than a shrunken version of the old chart.
+     widths. Trimmed to 26 columns (last ~6 months, see WINDOW_WEEKS in
+     src/lib/contributions.ts) the grid is sized to fill the content column
+     exactly instead: 26 fixed `1fr` column tracks always divide the full
+     available width evenly, so the grid spans edge to edge at any
+     viewport — the 600px desktop content area (inside <main>'s 680px
+     border-box and 40px side padding), the 343px phone content area at
+     375px, and everything in between (including the 641-759px range where
+     the outer column is still growing toward its cap) — without a fixed
+     pixel size ever falling out of sync with the container at some
+     in-between width. Cells are square via `aspect-ratio: 1` on a
+     100%-wide cell, so height always follows the computed column width
+     rather than a hardcoded px value — never a stretched rectangle, and no
+     horizontal scroll is ever needed since the grid never exceeds its
+     container. See WINDOW_WEEKS in src/lib/contributions.ts for the full
+     arithmetic behind landing on 26 weeks specifically (~20px cells at
+     600px, ~11px at 343px, both measured directly, not estimated).
   */
   .contrib-wrap {
     padding-bottom: 2px;
@@ -61,28 +69,26 @@ const placeholderCells = Array.from({ length: PLACEHOLDER_WEEKS * 7 });
   .contrib-grid {
     display: grid;
     grid-auto-flow: column;
-    grid-template-rows: repeat(7, 16px);
-    grid-auto-columns: 16px;
-    gap: 4px;
-    width: max-content;
+    grid-template-columns: repeat(26, 1fr);
+    grid-template-rows: repeat(7, auto);
+    gap: 3px;
+    width: 100%;
   }
   .contrib-grid :global(.contrib-cell) {
     display: block;
-    width: 16px;
-    height: 16px;
-    border-radius: 3px;
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 2px;
     background: var(--cellEmpty);
   }
 
-  @media (max-width: 640px) {
+  /* Narrow phones: a smaller fixed gap leaves a bit more of the column
+     width for the cells themselves (still legible at ~11px, see the
+     WINDOW_WEEKS comment), rather than eating into it evenly with the
+     desktop gap. */
+  @media (max-width: 420px) {
     .contrib-grid {
-      grid-template-rows: repeat(7, 13px);
-      grid-auto-columns: 13px;
-      gap: 3px;
-    }
-    .contrib-grid :global(.contrib-cell) {
-      width: 13px;
-      height: 13px;
+      gap: 2px;
     }
   }
 </style>

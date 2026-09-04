@@ -81,6 +81,12 @@ test('resume is not in robots.txt or any sitemap', async ({ request }) => {
     const body = await robots.text();
     expect(body).not.toContain('resume');
   }
+  // @astrojs/sitemap serves sitemap-index.xml / sitemap-0.xml, not a plain
+  // /sitemap.xml, and only writes them during `astro build` — this suite's
+  // dev-server webServer won't have either route, so this live request is
+  // expected to just skip below. tests/sitemap.spec.ts is the real
+  // regression guard for this: it reads the built sitemap files directly
+  // off disk and asserts 'hereismyresume' is absent from both.
   const sitemap = await request.get('/sitemap.xml');
   if (sitemap.ok()) {
     const body = await sitemap.text();
