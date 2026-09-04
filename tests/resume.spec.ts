@@ -4,9 +4,11 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const PAGE = '/resume';
-const PDF = '/resume.pdf';
+const PAGE = '/resume-cifz9eqb';
+const PDF = '/resume-cifz9eqb.pdf';
 const OLD_SECRET = '/2v16erb7nu5o5c';
+const GUESSABLE_PAGE = '/resume';
+const GUESSABLE_PDF = '/resume.pdf';
 
 test('the resume page renders and offers a way back', async ({ page }) => {
   await page.goto(PAGE);
@@ -19,7 +21,7 @@ test('the resume page is noindex via meta tag', async ({ page }) => {
     .toHaveAttribute('content', /noindex/);
 });
 
-test('the pdf is served at the readable path', async ({ request }) => {
+test('the pdf is served at the readable-with-entropy path', async ({ request }) => {
   const res = await request.get(PDF);
   expect(res.status()).toBe(200);
   expect(res.headers()['content-type']).toContain('pdf');
@@ -31,7 +33,7 @@ test('the pdf is served at the readable path', async ({ request }) => {
 // webServer runs — same reason tests/redirects.spec.ts reads its stub files
 // straight off disk rather than navigating a live page. So this reads the
 // header rules directly rather than asserting on a live response.
-test('public/_headers sets X-Robots-Tag noindex on both /resume and /resume.pdf', () => {
+test('public/_headers sets X-Robots-Tag noindex on both the page and the pdf', () => {
   const headers = readFileSync(join(__dirname, '..', 'public', '_headers'), 'utf-8');
   for (const path of [PAGE, PDF]) {
     const lines = headers.split('\n');
@@ -48,9 +50,29 @@ test('public/_headers sets X-Robots-Tag noindex on both /resume and /resume.pdf'
   }
 });
 
-test('the old high-entropy path redirects to /resume', async ({ page }) => {
+test('the old high-entropy path redirects to the current resume path', async ({ page }) => {
   await page.goto(OLD_SECRET);
-  await expect(page).toHaveURL(/\/resume\/?$/);
+  await expect(page).toHaveURL(/\/resume-cifz9eqb\/?$/);
+});
+
+// Regression guard: an earlier version of this site put the resume at the
+// guessable bare /resume path, then "fixed" it with a redirect from
+// /resume to the real url — which defeats the whole point, since anyone
+// enumerating common paths lands on the real resume via the redirect.
+// /resume and /resume.pdf must not exist at all: no 200, and no 3xx
+// pointing (directly or indirectly) at the real path.
+test('the guessable /resume path does not resolve', async ({ request }) => {
+  const res = await request.get(GUESSABLE_PAGE, { maxRedirects: 0 });
+  expect(res.status()).not.toBe(200);
+  const isRedirect = res.status() >= 300 && res.status() < 400;
+  expect(isRedirect, `expected no redirect, got ${res.status()} ${res.headers()['location'] ?? ''}`).toBe(false);
+});
+
+test('the guessable /resume.pdf path does not resolve', async ({ request }) => {
+  const res = await request.get(GUESSABLE_PDF, { maxRedirects: 0 });
+  expect(res.status()).not.toBe(200);
+  const isRedirect = res.status() >= 300 && res.status() < 400;
+  expect(isRedirect, `expected no redirect, got ${res.status()} ${res.headers()['location'] ?? ''}`).toBe(false);
 });
 
 test('resume is not in robots.txt or any sitemap', async ({ request }) => {

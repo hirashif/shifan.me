@@ -18,17 +18,24 @@ Floating dock at the bottom on every page: home · writing · learnings · plot 
 - **Only "shifan".** The last name never appears anywhere on the site, in metadata, or in alt text. Email is fine.
 - **No resume link/page in the site's navigation or content.** Work history lives in
   the timeline on home. One deliberate exception, added at shifan's request: an
-  *unlisted* resume page at `/resume` (PDF at `/resume.pdf`). The path used to be a
-  high-entropy string (`/2v16erb7nu5o5c`, which now 301-redirects to `/resume` — keep
-  that redirect, old links are out in the wild); shifan asked for the readable path
-  instead because the unguessable one "reads weird in emails," accepting that a
-  readable path is guessable in exchange for it being shareable. It stays out of search
-  two ways: `<meta name="robots" content="noindex, nofollow">` on the page, and an
-  `X-Robots-Tag: noindex, nofollow, noarchive, noai, noimageai` response header on both
-  `/resume` and `/resume.pdf` via `public/_headers` (the header is the only way to
-  noindex the PDF itself — it can't carry a meta tag). It is still linked from nowhere
-  on the site and excluded from any sitemap. Do not link to it, do not delete it, and do
-  not "fix" the path back to something high-entropy — that reversal was intentional.
+  *unlisted* resume page at `/resume-cifz9eqb` (PDF at `/resume-cifz9eqb.pdf`). The
+  path keeps the word "resume" so it reads as what it is when pasted into an email,
+  plus a random suffix (~41 bits of entropy) so it cannot be found by guessing or by a
+  crawler enumerating common paths. A bare `/resume` was tried once and rejected:
+  shifan wants a link he can email but not one that's "the single most likely path
+  anyone would try." **`/resume` and `/resume.pdf` must not exist and must not
+  redirect anywhere** — not even to the real path — because a redirect from the
+  guessable path hands anyone enumerating it the real url and defeats the entire
+  point. Do not "tidy" this back to `/resume`. The old high-entropy path
+  `/2v16erb7nu5o5c` still 301-redirects to the current resume path (old links are out
+  in the wild, keep that redirect working) — if the resume path ever changes again,
+  update that redirect's target, don't remove it. It stays out of search two ways:
+  `<meta name="robots" content="noindex, nofollow">` on the page, and an
+  `X-Robots-Tag: noindex, nofollow, noarchive, noai, noimageai` response header on
+  both `/resume-cifz9eqb` and `/resume-cifz9eqb.pdf` via `public/_headers` (the header
+  is the only way to noindex the PDF itself — it can't carry a meta tag). It is still
+  linked from nowhere on the site and excluded from any sitemap. Do not link to it and
+  do not delete it.
 - **lowercase everywhere.** copy, headings, nav, tooltips. brand names too (paycom, postgres). the only capitals are in code/badges like `LIVE`. Approved exception: roman
   numerals in job titles, e.g. `software developer II` (see `src/content/work.ts`) — same
   spirit as the `LIVE`/`OSS` badge exception, not a loophole to generalize from.
