@@ -10,7 +10,7 @@ export const work: WorkRow[] = [
   {
     title: 'paycom',
     role: 'software developer ii, crm team',
-    desc: 'backend crm services and internal tools — a tax dashboard, event-driven tasking, and a sync process that stopped falling over.',
+    desc: 'backend crm services and internal tools. tax dashboards and event-driven tasking.',
     dates: 'sep 2024 – jun 2026',
   },
   {

@@ -53,40 +53,30 @@ function iconPath(slug: string): string | null {
   return match[1];
 }
 ---
-<div class="chips">
-  {stack.map((s, i) => {
+<ul class="chips">
+  {stack.map((s) => {
     const path = iconPath(s.slug);
     return (
-      <button
-        type="button"
-        data-skill={i}
-        data-label={s.label}
-        data-note={s.note}
-        aria-pressed="false"
-        class="chip"
-      >
+      <li class="chip">
         {path && (
           <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d={path}></path></svg>
         )}
         <span>{s.label}</span>
-      </button>
+      </li>
     );
   })}
-</div>
-<div data-skill-note hidden class="skill-note">
-  <span data-skill-note-name class="skill-note-name"></span>
-  <span data-skill-note-text></span>
-</div>
+</ul>
 
 <style>
   .chips {
     display: flex;
     flex-wrap: wrap;
     gap: 6px 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
   .chip {
-    all: unset;
-    cursor: pointer;
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -98,35 +88,5 @@ function iconPath(slug: string): string | null {
     border-radius: 6px;
     padding: 4px 9px;
     box-sizing: border-box;
-    transition: border-color 0.15s, color 0.15s;
-  }
-  .chip:hover,
-  .chip[aria-pressed='true'] {
-    border-color: var(--acc);
-    color: var(--fg);
-  }
-  .skill-note {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 12px;
-    padding: 12px 14px;
-    border-radius: 10px;
-    background: var(--card);
-    border: 1px solid var(--dockLine);
-    font-size: 14px;
-    line-height: 1.5;
-    color: var(--fg2);
-    animation: pop 0.18s ease-out both;
-  }
-  .skill-note-name {
-    font-family: 'Geist Mono Variable', ui-monospace, monospace;
-    font-size: 12.5px;
-    color: var(--accText);
-    padding-top: 2px;
   }
 </style>
-
-<script>
-  import { initStack } from './stack';
-  initStack();
-</script>
