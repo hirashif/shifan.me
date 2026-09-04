@@ -32,9 +32,16 @@ for (const route of ROUTES) {
   });
 }
 
-test('no route links to a resume', async ({ page }) => {
+// The dock deliberately links to /hereismyresume on every page (see
+// CLAUDE.md's resume rule) — being linked is fine. What still must hold is
+// that the resume is not indexed, which tests/resume.spec.ts asserts via
+// the noindex meta tag and X-Robots-Tag header. This just confirms the dock
+// link is present and points at the real resume path, not a stray one.
+test('the dock resume link points at the real resume path', async ({ page }) => {
   for (const route of ROUTES) {
     await page.goto(route);
-    await expect(page.locator('a[href*="resume" i]')).toHaveCount(0);
+    const links = page.locator('a[href*="resume" i]');
+    await expect(links).toHaveCount(1);
+    await expect(links.first()).toHaveAttribute('href', '/hereismyresume');
   }
 });

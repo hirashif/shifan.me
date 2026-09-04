@@ -11,18 +11,18 @@ A small, fast, mostly-static personal site with a few live bits:
 - **/learnings** — exactly 15 one-liners. no dates, no tags, no filters. when a new one is added, an old one is removed. mix of life and work.
 - **/plot** — the full pixel guestbook + recent claims list.
 
-Floating dock at the bottom on every page: home · writing · learnings · plot · | · github · linkedin · email (copies to clipboard, "copied" bubble) · theme (sun/moon).
+Floating dock at the bottom on every page: home · writing · learnings · plot · resume · | · github · linkedin · email (copies to clipboard, "copied" bubble) · theme (sun/moon).
 
 ## Hard rules (do not break these)
 
 - **Only "shifan".** The last name never appears anywhere on the site, in metadata, or in alt text. Email is fine.
-- **No resume link/page in the site's navigation or content.** Work history lives in
-  the timeline on home. One deliberate exception, added at shifan's request: an
-  *unlisted* resume page at `/hereismyresume` (PDF at `/hereismyresume.pdf`). This is
-  the final arrangement — it went through two rejected attempts (a guessable bare
-  `/resume`, then a random-suffixed `/resume-cifz9eqb` that "reads like malware in an
-  email") before landing here, so do not change the path or its shape again without
-  shifan asking.
+- **The resume is linked from the dock, not from page content.** Work history lives
+  in the timeline on home. The dock (every page) has a `resume` item, in the first
+  group after `the plot` and before the `|` divider, pointing at `/hereismyresume`
+  (PDF at `/hereismyresume.pdf`). This is the final arrangement — it went through two
+  rejected attempts (a guessable bare `/resume`, then a random-suffixed
+  `/resume-cifz9eqb` that "reads like malware in an email") before landing here, so
+  do not change the path or its shape again without shifan asking.
 
   The path is fully readable, with no random-looking characters — it reads naturally
   pasted into an email ("here's my resume: shifan.me/hereismyresume") — and it is not
@@ -44,13 +44,14 @@ Floating dock at the bottom on every page: home · writing · learnings · plot 
   it. The since-abandoned `/resume-cifz9eqb` path has no redirect (it was never
   shared, so there is nothing to preserve) and must not be reintroduced.
 
-  What actually keeps this out of search is **not** the path's obscurity — it's two
-  explicit signals, and both must stay: `<meta name="robots" content="noindex,
-  nofollow">` on the page, and an `X-Robots-Tag: noindex, nofollow, noarchive, noai,
-  noimageai` response header on both `/hereismyresume` and `/hereismyresume.pdf` via
-  `public/_headers` (the header is the only way to noindex the PDF itself — it can't
-  carry a meta tag). It is still linked from nowhere on the site and excluded from
-  any sitemap. Do not link to it and do not delete it.
+  What keeps this out of search and AI indexes is **not** being unlinked — it's being
+  linked from the dock while carrying two explicit signals, and both must stay:
+  `<meta name="robots" content="noindex, nofollow">` on the page, and an
+  `X-Robots-Tag: noindex, nofollow, noarchive, noai, noimageai` response header on
+  both `/hereismyresume` and `/hereismyresume.pdf` via `public/_headers` (the header
+  is the only way to noindex the PDF itself — it can't carry a meta tag). It is still
+  excluded from any sitemap. Do not delete the dock link, and do not remove the
+  noindex meta or header thinking the dock link alone is enough.
 - **lowercase everywhere.** copy, headings, nav, tooltips. brand names too (paycom, postgres). the only capitals are in code/badges like `LIVE`. Approved exception: roman
   numerals in job titles, e.g. `software developer II` (see `src/content/work.ts`) — same
   spirit as the `LIVE`/`OSS` badge exception, not a loophole to generalize from.

@@ -8,6 +8,8 @@ const ICONS: Record<string, string> = {
     '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18h6"></path><path d="M10 21h4"></path><path d="M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.3 1 2.5h6c0-1.2.4-1.9 1-2.5A6 6 0 0 0 12 3z"></path></svg>',
   squares:
     '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg>',
+  resume:
+    '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6.5 3h7l5 5v12a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"></path><path d="M13.5 3v5h5"></path></svg>',
   github:
     '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56 0-.27-.01-1.17-.02-2.12-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.75 2.69 1.25 3.34.95.1-.74.4-1.25.72-1.53-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18.92-.26 1.9-.38 2.88-.39.98 0 1.96.13 2.88.39 2.2-1.49 3.16-1.18 3.16-1.18.63 1.59.24 2.76.12 3.05.74.81 1.19 1.83 1.19 3.09 0 4.42-2.7 5.39-5.26 5.68.41.35.78 1.05.78 2.12 0 1.53-.01 2.76-.01 3.14 0 .31.2.68.8.56A10.52 10.52 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"></path></svg>',
   linkedin:
@@ -27,9 +29,10 @@ const items = [
   { href: '/writing', label: 'writing', icon: 'pencil' },
   { href: '/learnings', label: 'learnings', icon: 'bulb' },
   { href: '/plot', label: 'the plot', icon: 'squares' },
+  { href: '/hereismyresume', label: 'resume', icon: 'resume' },
 ];
 ---
-<nav aria-label="site" class="dock-nav" style="position:sticky;bottom:20px;align-self:center;margin:24px 0 20px;padding:6px;display:flex;gap:2px;border-radius:12px;background:var(--dock);border:1px solid var(--dockLine);box-shadow:var(--shadow);backdrop-filter:blur(12px);animation:dockIn .7s .4s both">
+<nav aria-label="site" class="dock-nav" style="position:sticky;bottom:20px;align-self:center;margin:24px 0 20px;display:flex;border-radius:12px;background:var(--dock);border:1px solid var(--dockLine);box-shadow:var(--shadow);backdrop-filter:blur(12px);animation:dockIn .7s .4s both">
   {items.map((it) => (
     <a href={it.href} aria-label={it.label} data-tip={it.label}
        class:list={['dock-item', { 'is-active': active(it.href) }]}>
@@ -48,6 +51,10 @@ const items = [
 </nav>
 
 <style>
+  .dock-nav {
+    padding: 6px;
+    gap: 2px;
+  }
   .dock-item {
     position:relative; width:38px; height:38px; border-radius:8px;
     display:grid; place-items:center; color:var(--fg2);
@@ -74,8 +81,17 @@ const items = [
   }
 
   @media (max-width: 640px) {
+    /* Ten items (five pages, a divider, then github/linkedin/email/theme)
+       no longer fit at the desktop item size and gap within a 375px
+       viewport — the row ran wider than the dock's own scroll box. Rather
+       than drop an item, shrink the item size, gap, and padding at this
+       breakpoint so the whole row fits with room to spare; overflow-x:auto
+       below stays as a safety net for narrower viewports, not the primary
+       fit strategy. */
     .dock-nav {
       max-width: calc(100vw - 24px);
+      padding: 5px;
+      gap: 1px;
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
@@ -83,8 +99,11 @@ const items = [
     .dock-nav::-webkit-scrollbar { display: none; }
     .dock-item {
       flex: none;
-      width: 40px;
-      height: 40px;
+      width: 34px;
+      height: 34px;
+    }
+    .divider {
+      margin: 5px 3px;
     }
     /* Hover-only lift/tooltip fights touch: taps register as both hover
        and click on many mobile browsers, which pops the tooltip and jumps

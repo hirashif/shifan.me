@@ -88,9 +88,18 @@ test('resume is not in robots.txt or any sitemap', async ({ request }) => {
   }
 });
 
-test('nothing on the site links to the resume', async ({ page }) => {
+// The resume is now deliberately linked from the dock on every page (see
+// CLAUDE.md's resume rule). What still has to hold is not "unlinked" — it's
+// "not indexed": the dock link points at the real path, and staying out of
+// search/AI indexes is carried entirely by the noindex meta tag and the
+// X-Robots-Tag header asserted elsewhere in this file, not by obscurity.
+test('the dock links to the resume on every route', async ({ page }) => {
   for (const route of ['/', '/writing', '/learnings', '/plot']) {
     await page.goto(route);
-    await expect(page.locator(`a[href*="resume" i]`)).toHaveCount(0);
+    const dockLink = page.locator('nav[aria-label="site"]').getByRole('link', { name: 'resume' });
+    await expect(dockLink).toBeVisible();
+    await expect(dockLink).toHaveAttribute('href', PAGE);
+    // Internal navigation — must not open in a new tab like github/linkedin do.
+    await expect(dockLink).not.toHaveAttribute('target', '_blank');
   }
 });
