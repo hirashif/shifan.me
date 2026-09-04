@@ -14,12 +14,8 @@ export const stack: Skill[] = [
   { slug: 'springboot', label: 'spring boot' },
   { slug: 'kubernetes', label: 'kubernetes' },
   { slug: 'docker', label: 'docker' },
-  { slug: 'terraform', label: 'terraform' },
   { slug: 'claude', label: 'claude code' },
   { slug: 'cursor', label: 'cursor' },
   { slug: 'opencode', label: 'opencode' },
-  { slug: 'codex', label: 'codex' },
   { slug: 'react', label: 'react' },
-  { slug: 'azure', label: 'azure' },
-  { slug: 'githubactions', label: 'github actions' },
 ];

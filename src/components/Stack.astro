@@ -15,17 +15,11 @@ import redisSvg from '../../node_modules/simple-icons/icons/redis.svg?raw';
 import springbootSvg from '../../node_modules/simple-icons/icons/springboot.svg?raw';
 import kubernetesSvg from '../../node_modules/simple-icons/icons/kubernetes.svg?raw';
 import dockerSvg from '../../node_modules/simple-icons/icons/docker.svg?raw';
-import terraformSvg from '../../node_modules/simple-icons/icons/terraform.svg?raw';
 import claudeSvg from '../../node_modules/simple-icons/icons/claude.svg?raw';
 import cursorSvg from '../../node_modules/simple-icons/icons/cursor.svg?raw';
 import opencodeSvg from '../../node_modules/simple-icons/icons/opencode.svg?raw';
 import reactSvg from '../../node_modules/simple-icons/icons/react.svg?raw';
-import githubactionsSvg from '../../node_modules/simple-icons/icons/githubactions.svg?raw';
 
-// `codex` and `azure` have no icon in this installed simple-icons version
-// (16.29.0) — confirmed by checking node_modules/simple-icons/icons/ before
-// wiring these up. Both chips fall back to no icon (label only) rather than
-// an invented path or a broken import.
 const ICONS: Record<string, string> = {
   go: goSvg,
   openjdk: openjdkSvg,
@@ -37,12 +31,10 @@ const ICONS: Record<string, string> = {
   springboot: springbootSvg,
   kubernetes: kubernetesSvg,
   docker: dockerSvg,
-  terraform: terraformSvg,
   claude: claudeSvg,
   cursor: cursorSvg,
   opencode: opencodeSvg,
   react: reactSvg,
-  githubactions: githubactionsSvg,
 };
 
 function iconPath(slug: string): string | null {
