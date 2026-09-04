@@ -1,0 +1,89 @@
+---
+---
+<span class="tok-wrap" data-tok-wrap tabindex="0" aria-describedby="tok-card-note">
+  <span>tokens burned today</span>
+  <span class="tok-amount tnum" data-tok-amount>—</span>
+  <div class="tok-card tnum" data-tok-card hidden>
+    <div class="tok-row">
+      <span>today</span>
+      <span class="tok-val tok-val-acc" data-tok-card-today>—</span>
+    </div>
+    <div class="tok-row">
+      <span>this week</span>
+      <span class="tok-val" data-tok-card-week>—</span>
+    </div>
+    <div class="tok-row">
+      <span>this year</span>
+      <span class="tok-val" data-tok-card-year>—</span>
+    </div>
+    <div class="tok-row tok-row-tokens">
+      <span>tokens today</span>
+      <span class="tok-val" data-tok-card-tokens>—</span>
+    </div>
+    <div class="tok-note" id="tok-card-note">counted from my claude code logs, priced at api rates.</div>
+  </div>
+</span>
+
+<style>
+  .tok-wrap {
+    position: relative;
+    display: inline-flex;
+    gap: 8px;
+    align-items: baseline;
+    cursor: help;
+  }
+  .tok-amount {
+    color: var(--accText);
+    font-size: 13px;
+  }
+  .tok-card {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 12px);
+    z-index: 5;
+    width: 240px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: var(--card);
+    border: 1px solid var(--dockLine);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    animation: pop 0.18s ease-out both;
+  }
+  /* Same specificity gotcha as Plot.astro's `.claim-bar[hidden]`: the
+     `display:flex` above ties with the UA `[hidden]{display:none}` rule,
+     and an author stylesheet wins that tie, so without this the `hidden`
+     property toggled from tokens.ts wouldn't actually hide the card. */
+  .tok-card[hidden] {
+    display: none;
+  }
+  .tok-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--fg2);
+  }
+  .tok-row-tokens {
+    padding-top: 6px;
+    border-top: 1px solid var(--line);
+  }
+  .tok-val {
+    color: var(--fg);
+  }
+  .tok-val-acc {
+    color: var(--accText);
+  }
+  .tok-note {
+    font-size: 11px;
+    color: var(--fg3);
+    line-height: 1.4;
+  }
+</style>
+
+<script>
+  import { initTokenFooter } from './tokens';
+  initTokenFooter();
+</script>

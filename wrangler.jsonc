@@ -6,5 +6,6 @@
   "assets": { "directory": "./dist", "binding": "ASSETS" },
   "d1_databases": [
     { "binding": "DB", "database_name": "shifan-plot", "database_id": "800a3da5-5dd4-4da2-9c32-47fff94cbb75" }
-  ]
+  ],
+  "kv_namespaces": [{ "binding": "USAGE", "id": "73890746ae9e4c4d8a617ba12d6b7a5c" }]
 }

@@ -5,6 +5,7 @@ import Uptime from '../components/Uptime.astro';
 import Timeline from '../components/Timeline.astro';
 import Stack from '../components/Stack.astro';
 import Plot from '../components/Plot.astro';
+import TokenFooter from '../components/TokenFooter.astro';
 import { learnings } from '../content/learnings';
 import { projects } from '../content/projects';
 import { getCollection } from 'astro:content';
@@ -104,8 +105,7 @@ const posts = (await getCollection('writing'))
   </section>
 
   <footer class="fade-up" style="animation-delay:440ms">
-    <!-- Task 11 mounts the live claude-token spend readout here. -->
-    <div data-token-readout></div>
+    <div data-token-readout><TokenFooter /></div>
     <span class="lights-hint">press <kbd class="key">t</kbd> to flip the lights</span>
   </footer>
 </Base>

@@ -10,5 +10,17 @@ declare namespace Cloudflare {
     GITHUB_CLIENT_ID: string;
     GITHUB_CLIENT_SECRET: string;
     SESSION_SECRET: string;
+    USAGE_TOKEN: string;
   }
+}
+
+// `crypto.subtle.timingSafeEqual` is a real, non-standard extension to
+// SubtleCrypto that only exists in workerd (Cloudflare's Workers runtime —
+// confirmed present in node_modules/.pnpm/workerd@*/node_modules/workerd/worker.mjs,
+// the actual binary `astro dev` runs on). It's what src/pages/api/usage.ts
+// uses for constant-time bearer-token comparison. The ambient DOM lib's
+// `SubtleCrypto` type has no idea it exists, so it's declaration-merged in
+// here rather than cast to `any` at the call site.
+interface SubtleCrypto {
+  timingSafeEqual(a: ArrayBufferView | ArrayBuffer, b: ArrayBufferView | ArrayBuffer): boolean;
 }
