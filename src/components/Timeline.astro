@@ -5,7 +5,9 @@ import { work } from '../content/work';
   {work.map((w) => (
     <div data-work-row class="timeline-row">
       {w.logo && !w.isCurrent ? (
-        <img class="row-logo" src={w.logo} alt={w.title} width="18" height="18" loading="lazy" />
+        <span class="logo-badge">
+          <img class="row-logo" src={w.logo} alt={w.title} width="16" height="16" loading="lazy" />
+        </span>
       ) : (
         <span class:list={['dot', { 'dot-current': w.isCurrent }]}></span>
       )}
@@ -22,6 +24,11 @@ import { work } from '../content/work';
 
 <style>
   .timeline {
+    /* rail-x = center of the border-left line, relative to a row's content
+       edge: -(border-width + padding-left) + border-width / 2. Keep this in
+       sync with padding-left below (and its media-query overrides) so the
+       dot/logo stay centred on the rail at every breakpoint. */
+    --rail-x: -22.5px;
     display: flex;
     flex-direction: column;
     position: relative;
@@ -37,26 +44,38 @@ import { work } from '../content/work';
   }
   .dot {
     position: absolute;
-    left: -27px;
-    top: 6px;
+    left: var(--rail-x);
+    top: 10.5px;
     width: 9px;
     height: 9px;
     border-radius: 50%;
     box-sizing: border-box;
     background: var(--bg);
     border: 1.5px solid var(--fg3);
+    transform: translate(-50%, -50%);
   }
   .dot-current {
     background: var(--acc);
     border: none;
     animation: pulse 1.8s ease-out infinite;
   }
-  .row-logo {
+  .logo-badge {
     position: absolute;
-    left: -31px;
-    top: -1px;
-    width: 18px;
-    height: 18px;
+    left: var(--rail-x);
+    top: 10.5px;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translate(-50%, -50%);
+  }
+  .row-logo {
+    display: block;
+    width: 16px;
+    height: 16px;
     border-radius: 4px;
     object-fit: contain;
   }
@@ -85,6 +104,7 @@ import { work } from '../content/work';
 
   @media (max-width: 640px) {
     .timeline {
+      --rail-x: -20.5px;
       padding-left: 20px;
       gap: 20px;
     }

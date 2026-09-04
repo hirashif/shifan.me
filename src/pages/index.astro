@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import Name from '../components/Name.astro';
 import Uptime from '../components/Uptime.astro';
 import Timeline from '../components/Timeline.astro';
+import Contributions from '../components/Contributions.astro';
 import Education from '../components/Education.astro';
 import Stack from '../components/Stack.astro';
 import Plot from '../components/Plot.astro';
@@ -27,12 +28,14 @@ const posts = (await getCollection('writing'))
     <Uptime />
   </header>
 
-  <section id="work" class="fade-up" style="animation-delay:80ms">
+  <Contributions delay={80} />
+
+  <section id="work" class="fade-up" style="animation-delay:140ms">
     <div class="section-label">work</div>
     <Timeline />
   </section>
 
-  <section id="learned" class="fade-up" style="animation-delay:140ms">
+  <section id="learned" class="fade-up" style="animation-delay:200ms">
     <p class="learned-lead">
       a few <a href="/learnings" class="learned-link">things i've learned</a> so far, mostly the hard way.
     </p>
@@ -46,7 +49,7 @@ const posts = (await getCollection('writing'))
     </ul>
   </section>
 
-  <section id="writing" class="fade-up" style="animation-delay:200ms">
+  <section id="writing" class="fade-up" style="animation-delay:260ms">
     <div class="row-head">
       <span class="section-label">writing</span>
       <a href="/writing" class="all-link">all →</a>
@@ -59,7 +62,7 @@ const posts = (await getCollection('writing'))
     ))}
   </section>
 
-  <section id="projects" class="fade-up" style="animation-delay:260ms">
+  <section id="projects" class="fade-up" style="animation-delay:320ms">
     <div class="section-label" style="padding-bottom:8px">projects</div>
     <div class="project-grid">
       {projects.map((p) => {
@@ -80,7 +83,7 @@ const posts = (await getCollection('writing'))
     </div>
   </section>
 
-  <section id="plot" class="fade-up" style="animation-delay:320ms">
+  <section id="plot" class="fade-up" style="animation-delay:380ms">
     <div class="row-head">
       <span class="section-label">the plot</span>
       <span class="plot-count mono" data-plot-count><span data-plot-count-num>–</span> / 400 pixels claimed</span>
@@ -93,19 +96,19 @@ const posts = (await getCollection('writing'))
     </div>
   </section>
 
-  <section id="stack" class="fade-up" style="animation-delay:380ms">
+  <section id="stack" class="fade-up" style="animation-delay:440ms">
     <div class="row-head">
       <span class="section-label">stack</span>
     </div>
     <Stack />
   </section>
 
-  <section id="education" class="fade-up" style="animation-delay:440ms">
+  <section id="education" class="fade-up" style="animation-delay:500ms">
     <div class="section-label">education</div>
     <Education />
   </section>
 
-  <footer class="fade-up" style="animation-delay:500ms">
+  <footer class="fade-up" style="animation-delay:560ms">
     <div data-token-readout><TokenFooter /></div>
     <span class="lights-hint">press <kbd class="key">t</kbd> to flip the lights</span>
   </footer>
