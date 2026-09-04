@@ -11,6 +11,6 @@ export default defineConfig({
     // silently daemonizes `astro dev`, exiting the foreground process once the
     // background server is up. That breaks Playwright's webServer, which needs
     // the spawned process to stay alive. This opts back into foreground mode.
-    env: { ASTRO_DEV_BACKGROUND: '1' },
+    env: { ASTRO_DEV_BACKGROUND: '1', ASTRO_DEV_TOOLBAR: '0' },
   },
 });
