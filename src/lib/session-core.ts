@@ -73,7 +73,19 @@ export function readCookie(request: Request, name: string): string | null {
   if (!header) return null;
   for (const part of header.split(';')) {
     const [k, ...v] = part.trim().split('=');
-    if (k === name) return decodeURIComponent(v.join('='));
+    if (k === name) {
+      try {
+        // decodeURIComponent throws URIError on invalid percent-encoding
+        // (e.g. a hand-crafted cookie like "shifan_session=%zz"). This ran
+        // outside any try/catch, so a malformed cookie 500'd every route
+        // that reads it — including /api/plot for a visitor with no
+        // session at all. A cookie that cannot be decoded is equivalent to
+        // no cookie, not a server error.
+        return decodeURIComponent(v.join('='));
+      } catch {
+        return null;
+      }
+    }
   }
   return null;
 }

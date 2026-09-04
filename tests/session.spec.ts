@@ -3,7 +3,34 @@ import { test, expect } from '@playwright/test';
 // but also defines `getSession`, which dynamically imports `cloudflare:workers`
 // — a module that only resolves inside the Worker runtime, not in this Node
 // test process. `session-core.ts` has no such dependency and is safe here.
-import { sign, verify, isSafeRedirect } from '../src/lib/session-core';
+import { sign, verify, isSafeRedirect, readCookie, COOKIE } from '../src/lib/session-core';
+
+// readCookie() has no dedicated coverage of its own — verify() was tested
+// exhaustively but the malformed-percent-encoding throw lived in readCookie,
+// upstream of verify()'s try/catch, so it escaped every one of those tests.
+function fakeRequest(cookieHeader: string | null): Request {
+  const headers = new Headers();
+  if (cookieHeader !== null) headers.set('cookie', cookieHeader);
+  return new Request('https://shifan.me/', { headers });
+}
+
+test('a malformed percent-encoding resolves to null instead of throwing', () => {
+  // decodeURIComponent('%zz') throws URIError — this is the exact
+  // reproduction from `curl -H 'Cookie: shifan_session=%zz' ...`.
+  expect(readCookie(fakeRequest(`${COOKIE}=%zz`), COOKIE)).toBeNull();
+});
+
+test('a validly percent-encoded value round-trips', () => {
+  expect(readCookie(fakeRequest(`${COOKIE}=abc%2Edef`), COOKIE)).toBe('abc.def');
+});
+
+test('a missing cookie header returns null', () => {
+  expect(readCookie(fakeRequest(null), COOKIE)).toBeNull();
+});
+
+test('a cookie header without the named cookie returns null', () => {
+  expect(readCookie(fakeRequest('other=1'), COOKIE)).toBeNull();
+});
 
 test('a signed payload verifies', async () => {
   const token = await sign({ id: '1', login: 'octocat' }, 'secret');

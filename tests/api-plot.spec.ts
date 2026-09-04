@@ -23,6 +23,17 @@ test('POST with a bad color is rejected before auth passes', async ({ request })
   expect([400, 401]).toContain(res.status());
 });
 
+test('GET with a malformed cookie resolves to no session instead of 500ing', async ({ request }) => {
+  // Regression test for the readCookie() fix: decodeURIComponent('%zz')
+  // throws URIError, and that used to escape unhandled all the way out of
+  // getSession(), 500ing every route that reads the session cookie —
+  // including this one, for a visitor with a corrupted (not even
+  // malicious) cookie.
+  const res = await request.get('/api/plot', { headers: { cookie: `${COOKIE}=%zz` } });
+  expect(res.status()).toBe(200);
+  expect(Array.isArray((await res.json()).cells)).toBe(true);
+});
+
 // The authenticated path (below) forges a session cookie with `sign()` from
 // `session-core` — the same pure function `/api/auth/callback` uses to mint
 // real ones — rather than driving a real GitHub OAuth round trip. The token
