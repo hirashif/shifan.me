@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Pushes a Claude Code usage snapshot to shifan.me's footer every hour.
+
+  Install:    cp scripts/me.shifan.usage-push.plist ~/Library/LaunchAgents/
+              launchctl load ~/Library/LaunchAgents/me.shifan.usage-push.plist
+  Remove:     launchctl unload ~/Library/LaunchAgents/me.shifan.usage-push.plist
+              rm ~/Library/LaunchAgents/me.shifan.usage-push.plist
+  Run once:   launchctl start me.shifan.usage-push
+  Log:        tail -f /tmp/shifan-usage-push.log
+
+  RunAtLoad fires one push on login so the footer is current after a reboot.
+  A missed run (laptop asleep) is not queued and retried; the next hourly tick
+  simply catches up, which is the right behaviour for a snapshot.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>me.shifan.usage-push</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/shifanhirani/Documents/GitHub/shifan.me/scripts/usage-cron.sh</string>
+    </array>
+
+    <key>StartInterval</key>
+    <integer>3600</integer>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/shifanhirani/Documents/GitHub/shifan.me</string>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/shifan-usage-push.out</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/shifan-usage-push.err</string>
+
+    <key>ProcessType</key>
+    <string>Background</string>
+    <key>LowPriorityIO</key>
+    <true/>
+    <key>Nice</key>
+    <integer>5</integer>
+</dict>
+</plist>
