@@ -2,9 +2,13 @@
 //
 // This module intentionally has no dependency on the Cloudflare Workers
 // runtime (no `cloudflare:workers` import), so it can be imported directly
-// in Node (e.g. by Playwright tests) as well as in the Worker. The
-// runtime-bound `getSession` — which needs `env.SESSION_SECRET` — lives in
-// `./session.ts` instead.
+// in Node (e.g. by Playwright tests) as well as in the Worker.
+//
+// Originally backed a github-oauth-derived session; now backs an anonymous
+// `shifan_visitor` cookie minted by `POST /api/plot` (see that route). The
+// `{id, login}` shape is unchanged — an anonymous visitor is signed as
+// `{id: crypto.randomUUID(), login: 'anon'}` — rather than generalising the
+// type, so this module (and its tests) didn't need to change shape at all.
 
 export interface SessionUser {
   id: string;
@@ -66,7 +70,7 @@ export async function verify(token: string, secret: string): Promise<SessionUser
   }
 }
 
-export const COOKIE = 'shifan_session';
+export const COOKIE = 'shifan_visitor';
 
 export function readCookie(request: Request, name: string): string | null {
   const header = request.headers.get('cookie');
@@ -76,7 +80,7 @@ export function readCookie(request: Request, name: string): string | null {
     if (k === name) {
       try {
         // decodeURIComponent throws URIError on invalid percent-encoding
-        // (e.g. a hand-crafted cookie like "shifan_session=%zz"). This ran
+        // (e.g. a hand-crafted cookie like "shifan_visitor=%zz"). This ran
         // outside any try/catch, so a malformed cookie 500'd every route
         // that reads it — including /api/plot for a visitor with no
         // session at all. A cookie that cannot be decoded is equivalent to

@@ -279,11 +279,6 @@ export function initPlot() {
     }
     claimBtn.removeAttribute('disabled');
 
-    if (res.status === 401) {
-      window.location.href = `/api/auth/github?back=${encodeURIComponent(location.pathname)}`;
-      return;
-    }
-
     if (res.status === 400) {
       showError(await errorMessage(res));
       return;

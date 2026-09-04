@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test';
-// Imported from `session-core`, not `session`: `session.ts` re-exports these
-// but also defines `getSession`, which dynamically imports `cloudflare:workers`
-// — a module that only resolves inside the Worker runtime, not in this Node
-// test process. `session-core.ts` has no such dependency and is safe here.
+// `session-core.ts` has no `cloudflare:workers` dependency (unlike the
+// runtime-bound helpers formerly in `session.ts`, which dynamically imported
+// it and needed `env.SESSION_SECRET` — that module was deleted once
+// `/api/plot` started calling `sign`/`verify`/`readCookie`/`cookieHeader`
+// directly), so it's safe to import straight into this Node test process.
 import { sign, verify, isSafeRedirect, readCookie, COOKIE } from '../src/lib/session-core';
 
 // readCookie() has no dedicated coverage of its own — verify() was tested
