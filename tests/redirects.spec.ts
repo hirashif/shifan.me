@@ -48,6 +48,16 @@ test('index.html and 404.html both redirect to the site root', () => {
   }
 });
 
+test('the kill-switch service worker exists and clears/unregisters', () => {
+  const sw = readFileSync(join(ROOT, 'sw.js'), 'utf-8');
+  // must exist at this exact path so a stale registration from the old
+  // GitProfile-era worker (or the prior kill-switch) fetches it on update
+  // rather than getting a 404, which the service worker spec would leave
+  // in place, stranding those visitors on cached old content forever.
+  expect(sw).toContain('unregister()');
+  expect(sw).toContain('caches.delete');
+});
+
 test('stub copy is lowercase and carries no emoji', () => {
   const files = [
     'index.html',
