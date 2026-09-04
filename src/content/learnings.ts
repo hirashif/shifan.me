@@ -9,11 +9,11 @@ export const learnings = [
   'fc barcelona, lewis hamilton, houston rockets.',
   'you can just do things.',
   'delayed gratification is a skill, not a personality trait.',
-  'idempotency keys are cheaper than apologies.',
-  'money bugs are different. everything else you can retry.',
-  'a retry without a budget is an outage with extra steps.',
-  'the bug is in the file you skimmed.',
-  'say the number out loud. if it sounds wrong, it is.',
+  'ask what would make this wrong before asking what would make it faster.',
+  "a result you can't reproduce isn't a result.",
+  'write it down before you fix it. the fix changes what you remember.',
+  'being wrong early is cheap. being wrong late is not.',
+  'measure it before you argue about it.',
 ] as const;
 
 // CLAUDE.md: learnings is capped at 15. Fail the build, not just a test.
