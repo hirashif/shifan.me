@@ -29,7 +29,7 @@ const items = [
   { href: '/plot', label: 'the plot', icon: 'squares' },
 ];
 ---
-<nav aria-label="site" style="position:sticky;bottom:20px;align-self:center;margin:24px 0 20px;padding:6px;display:flex;gap:2px;border-radius:12px;background:var(--dock);border:1px solid var(--dockLine);box-shadow:var(--shadow);backdrop-filter:blur(12px);animation:dockIn .7s .4s both">
+<nav aria-label="site" class="dock-nav" style="position:sticky;bottom:20px;align-self:center;margin:24px 0 20px;padding:6px;display:flex;gap:2px;border-radius:12px;background:var(--dock);border:1px solid var(--dockLine);box-shadow:var(--shadow);backdrop-filter:blur(12px);animation:dockIn .7s .4s both">
   {items.map((it) => (
     <a href={it.href} aria-label={it.label} data-tip={it.label}
        class:list={['dock-item', { 'is-active': active(it.href) }]}>
@@ -71,6 +71,33 @@ const items = [
     position:absolute; bottom:calc(100% + 12px); left:50%; transform:translateX(-50%);
     padding:4px 8px; border-radius:6px; background:var(--fg); color:var(--bg);
     font-size:11px; white-space:nowrap; animation:pop .18s ease-out both;
+  }
+
+  @media (max-width: 640px) {
+    .dock-nav {
+      max-width: calc(100vw - 24px);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .dock-nav::-webkit-scrollbar { display: none; }
+    .dock-item {
+      flex: none;
+      width: 40px;
+      height: 40px;
+    }
+    /* Hover-only lift/tooltip fights touch: taps register as both hover
+       and click on many mobile browsers, which pops the tooltip and jumps
+       the icon right as the tap lands. Neutralize the hover styling in any
+       viewport without a real pointer that supports hover. */
+  }
+  @media (hover: none) {
+    .dock-item:hover {
+      transform: none;
+    }
+    .dock-item::after {
+      display: none;
+    }
   }
 </style>
 

@@ -40,7 +40,7 @@
     top: 60px;
     left: 0;
     z-index: 5;
-    width: 300px;
+    width: min(300px, calc(100vw - 64px));
     padding: 12px 14px;
     border-radius: 10px;
     background: var(--card);
@@ -50,6 +50,23 @@
     line-height: 1.55;
     color: var(--fg2);
     animation: pop 0.18s ease-out both;
+  }
+  @media (max-width: 640px) {
+    .name-btn {
+      font-size: 32px;
+      min-height: auto;
+    }
+    .name-tip {
+      top: 46px;
+    }
+  }
+  @media (max-width: 420px) {
+    .name-btn {
+      font-size: 27px;
+    }
+    .name-tip {
+      top: 40px;
+    }
   }
   .name-tip-strong {
     color: var(--fg);

@@ -59,4 +59,14 @@ import { education } from '../content/education';
     color: var(--fg3);
     padding-top: 2px;
   }
+
+  @media (max-width: 420px) {
+    .education-row {
+      grid-template-columns: 1fr;
+      gap: 4px;
+    }
+    .row-meta {
+      padding-top: 0;
+    }
+  }
 </style>

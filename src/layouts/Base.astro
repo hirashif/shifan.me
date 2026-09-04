@@ -7,7 +7,12 @@ import Dock from '../components/Dock.astro';
 interface Props { title: string; description?: string; pad?: 'home' | 'sub'; gap?: string }
 const { title, description = 'backend. money and market data.', pad = 'sub', gap: gapOverride } = Astro.props;
 const padTop = pad === 'home' ? '104px' : '72px';
+const padTop640 = pad === 'home' ? '56px' : '44px';
+const padTop420 = pad === 'home' ? '44px' : '36px';
 const gap = gapOverride ?? (pad === 'home' ? '64px' : '40px');
+const gapPx = parseInt(gap, 10);
+const gap640 = `${Math.max(24, Math.round(gapPx * 0.6))}px`;
+const gap420 = `${Math.max(18, Math.round(gapPx * 0.45))}px`;
 ---
 <!doctype html>
 <html lang="en">
@@ -29,9 +34,37 @@ const gap = gapOverride ?? (pad === 'home' ? '64px' : '40px');
     </script>
   </head>
   <body>
-    <main style={`max-width:680px;width:100%;margin:0 auto;padding:${padTop} 40px 40px;display:flex;flex-direction:column;gap:${gap};box-sizing:border-box`}>
+    <main
+      class="site-main"
+      style={`--pad-top:${padTop};--pad-top-640:${padTop640};--pad-top-420:${padTop420};--gap:${gap};--gap-640:${gap640};--gap-420:${gap420}`}
+    >
       <slot />
     </main>
     <Dock />
   </body>
 </html>
+
+<style>
+  .site-main {
+    max-width: 680px;
+    width: 100%;
+    margin: 0 auto;
+    padding: var(--pad-top) 40px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+    box-sizing: border-box;
+  }
+  @media (max-width: 640px) {
+    .site-main {
+      padding: var(--pad-top-640) 20px 28px;
+      gap: var(--gap-640);
+    }
+  }
+  @media (max-width: 420px) {
+    .site-main {
+      padding: var(--pad-top-420) 16px 24px;
+      gap: var(--gap-420);
+    }
+  }
+</style>

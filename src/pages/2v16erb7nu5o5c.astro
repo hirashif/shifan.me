@@ -5,16 +5,57 @@ import Base from '../layouts/Base.astro';
   <Fragment slot="head">
     <meta name="robots" content="noindex, nofollow" />
   </Fragment>
-  <a href="/" class="mono" style="font-size:12.5px;color:var(--fg3);text-decoration:none">
-    ← back to shifan.me
-  </a>
-  <object data="/r-9f4c2ae81b7d63.pdf" type="application/pdf"
-          style="width:100%;height:80vh;border:1px solid var(--line);border-radius:10px">
-    <p style="font-size:15px;color:var(--fg2)">
+  <a href="/" class="mono back-link">← back to shifan.me</a>
+  <object data="/r-9f4c2ae81b7d63.pdf" type="application/pdf" class="pdf-embed">
+    <p class="fallback-text">
       your browser will not display this inline.
-      <a href="/r-9f4c2ae81b7d63.pdf" style="color:var(--accText)">open the pdf</a>.
+      <a href="/r-9f4c2ae81b7d63.pdf" class="fallback-link">open the pdf</a>.
     </p>
   </object>
-  <a href="/r-9f4c2ae81b7d63.pdf" class="mono"
-     style="font-size:12.5px;color:var(--accText);text-decoration:none">open the pdf →</a>
+  <a href="/r-9f4c2ae81b7d63.pdf" class="mono open-link">open the pdf →</a>
 </Base>
+
+<style>
+  .back-link {
+    font-size: 12.5px;
+    color: var(--fg3);
+    text-decoration: none;
+  }
+  .pdf-embed {
+    width: 100%;
+    height: 80vh;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    box-sizing: border-box;
+  }
+  .fallback-text {
+    font-size: 15px;
+    color: var(--fg2);
+    padding: 16px;
+  }
+  .fallback-link {
+    color: var(--accText);
+  }
+  .open-link {
+    font-size: 12.5px;
+    color: var(--accText);
+    text-decoration: none;
+  }
+
+  @media (max-width: 640px) {
+    /* Mobile browsers (mobile Safari especially) frequently can't render a
+       PDF inline inside <object> at all — no plugin, no built-in inline
+       viewer — and fall back to the <p> content instead. An 80vh box
+       reserved for that empty/failed embed wastes most of the screen, so
+       shrink it and lean harder on the always-present "open the pdf" link
+       below it. */
+    .pdf-embed {
+      height: 50vh;
+    }
+    .open-link {
+      display: inline-block;
+      padding: 8px 0;
+      font-size: 14px;
+    }
+  }
+</style>

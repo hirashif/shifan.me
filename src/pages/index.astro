@@ -323,4 +323,35 @@ const posts = (await getCollection('writing'))
     border-radius: 4px;
     padding: 0 5px;
   }
+
+  @media (max-width: 640px) {
+    header {
+      grid-template-columns: 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    .tagline {
+      font-size: 16px;
+    }
+    .project-grid {
+      gap: 10px;
+    }
+    .writing-row {
+      grid-template-columns: 1fr;
+      gap: 4px;
+    }
+    footer {
+      flex-wrap: wrap;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .project-grid {
+      grid-template-columns: 1fr;
+    }
+    .plot-footer {
+      flex-direction: column;
+      gap: 4px;
+    }
+  }
 </style>

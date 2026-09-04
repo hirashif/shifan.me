@@ -271,6 +271,56 @@ const cells = Array.from({ length: CELLS }, (_, i) => i);
     font-size: 11px;
     color: var(--fg3);
   }
+
+  @media (max-width: 640px) {
+    /* Let the full-page grid bleed to the viewport edges so the fixed
+       40-column shape gets as much room per cell as possible — the grid
+       shape itself is unchanged, only its container width. The negative
+       margins mirror the side padding Base.astro applies at this
+       breakpoint (20px), so the bleed lines up exactly with the edge. */
+    [data-plot-full='true'] .grid {
+      margin: 0 -20px;
+      width: calc(100% + 40px);
+      padding: 6px;
+      gap: 1.5px;
+      border-radius: 0;
+      border-left: 0;
+      border-right: 0;
+    }
+    .claim-bar {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .swatches {
+      justify-content: space-between;
+    }
+    .swatch {
+      width: 30px;
+      height: 30px;
+    }
+    .field {
+      padding: 10px 12px;
+      font-size: 15px;
+    }
+    .claim-actions {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 6px;
+    }
+    .claim-btn {
+      padding: 11px 12px;
+    }
+    .cancel-btn {
+      padding: 11px 14px;
+    }
+  }
+
+  @media (max-width: 420px) {
+    [data-plot-full='true'] .grid {
+      margin: 0 -16px;
+      width: calc(100% + 32px);
+    }
+  }
 </style>
 
 <script>

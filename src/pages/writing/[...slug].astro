@@ -143,4 +143,22 @@ const { Content } = await render(post);
     border-left: 2px solid var(--line);
     color: var(--fg3);
   }
+
+  @media (max-width: 640px) {
+    h1 {
+      font-size: 25px;
+    }
+    .post-meta {
+      flex-wrap: wrap;
+      gap: 8px 12px;
+    }
+  }
+  @media (max-width: 420px) {
+    h1 {
+      font-size: 22px;
+    }
+    .prose {
+      font-size: 15px;
+    }
+  }
 </style>

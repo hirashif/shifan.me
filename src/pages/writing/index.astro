@@ -178,4 +178,19 @@ const tags = ['all', ...new Set(posts.map((p) => p.data.tag))];
   .row-tag {
     color: var(--accText);
   }
+
+  @media (max-width: 640px) {
+    h1 {
+      font-size: 28px;
+    }
+    .row-top {
+      flex-direction: column;
+      gap: 2px;
+    }
+  }
+  @media (max-width: 420px) {
+    h1 {
+      font-size: 24px;
+    }
+  }
 </style>

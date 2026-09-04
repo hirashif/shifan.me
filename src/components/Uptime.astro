@@ -2,7 +2,7 @@
 import { calcUptime } from './uptime';
 const initial = calcUptime();
 ---
-<div class="uptime-wrap mono tnum">uptime<br /><span data-uptime class="uptime-value tnum">{initial}</span> yrs</div>
+<div class="uptime-wrap mono tnum">uptime<br class="uptime-break" /><span data-uptime class="uptime-value tnum">{initial}</span> yrs</div>
 
 <style>
   .uptime-wrap {
@@ -14,6 +14,17 @@ const initial = calcUptime();
   .uptime-value {
     color: var(--fg);
     font-size: 15px;
+  }
+  @media (max-width: 640px) {
+    .uptime-wrap {
+      text-align: left;
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+    .uptime-break {
+      display: none;
+    }
   }
 </style>
 
