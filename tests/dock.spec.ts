@@ -27,11 +27,17 @@ test('g key scrolls to the plot section', async ({ page }) => {
 });
 
 test('g key is ignored while an input is focused', async ({ page }) => {
+  // Stub so cell 0 is guaranteed empty and unclaimed — the claim bar (and
+  // its "name" input) only exists once an empty cell is clicked.
+  await page.route('**/api/plot', (r) =>
+    r.fulfill({ json: { cells: [], mine: null } }));
   await page.goto('/');
-  // The plot's own "name" field lives inside #plot, so focusing it already
-  // scrolls the section into view — that's an artifact of focus, not the
-  // shortcut. Isolate the shortcut's effect by comparing scroll position
-  // immediately before and after pressing "g" once focus has settled.
+  await page.locator('[data-cell="0"]').click();
+  // The plot's own "name" field lives inside #plot, so clicking into it
+  // already scrolls the section into view — that's an artifact of the
+  // click, not the shortcut. Isolate the shortcut's effect by comparing
+  // scroll position immediately before and after pressing "g" once focus
+  // has settled.
   await page.getByPlaceholder('name').click();
   const before = await page.evaluate(() => window.scrollY);
   await page.keyboard.press('g');

@@ -28,7 +28,7 @@ const cells = Array.from({ length: CELLS }, (_, i) => i);
   yours is at <span class="claimed-coord" data-plot-claimed-coord></span>. it stays.
 </div>
 
-<div class="claim-bar" data-plot-claim-bar>
+<div class="claim-bar" data-plot-claim-bar hidden>
   <div class="swatches">
     {PALETTE.map((hex, i) => (
       <button type="button" class="swatch" data-swatch={i} style={`background:${hex}`} aria-label={`pick color ${i + 1}`}></button>
@@ -37,8 +37,8 @@ const cells = Array.from({ length: CELLS }, (_, i) => i);
   <input type="text" class="field" data-plot-name placeholder="name" maxlength="40" autocomplete="off" />
   <input type="text" class="field" data-plot-msg placeholder="one line" maxlength="120" autocomplete="off" />
   <div class="claim-actions">
-    <button type="button" class="claim-btn" data-plot-claim-btn hidden>claim</button>
-    <button type="button" class="cancel-btn" data-plot-cancel aria-label="cancel" hidden>×</button>
+    <button type="button" class="claim-btn" data-plot-claim-btn>claim</button>
+    <button type="button" class="cancel-btn" data-plot-cancel aria-label="cancel">×</button>
   </div>
 </div>
 
@@ -147,6 +147,15 @@ const cells = Array.from({ length: CELLS }, (_, i) => i);
     border: 1px dashed var(--dockLine);
     border-radius: 10px;
     box-sizing: border-box;
+  }
+  /* `.claim-bar { display: grid }` above has the same specificity as the UA
+     stylesheet's `[hidden] { display: none }` rule, and an author stylesheet
+     wins that tie — so without this, toggling the `hidden` property from
+     plot.ts would have no visual effect and wouldn't remove the bar from
+     the tab order either (removeAttribute happens, but layout still shows
+     it). This makes `hidden` the single source of truth for visibility. */
+  .claim-bar[hidden] {
+    display: none;
   }
   .swatches {
     display: flex;

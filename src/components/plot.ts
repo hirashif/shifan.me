@@ -130,19 +130,16 @@ export function initPlot() {
   function hideTooltip() {
     hovered = null;
     tooltipEl.hidden = true;
-    renderRecent();
   }
 
-  // While a filled cell's tooltip is open, its "recent" row (if any) would
-  // put the exact same message text on the page twice at once. Rather than
-  // just CSS-hiding the duplicate row — a hidden node's text still exists in
-  // the DOM and still matches a plain text query — leave that one entry out
-  // of the render entirely for as long as its cell is hovered.
+  // Always the real newest rows, regardless of hover state. A guestbook
+  // entry showing up in both the tooltip and this list at the same time is
+  // expected — the tooltip is scoped to its own container, so there's no
+  // duplicate-text ambiguity for anything reading the page to resolve.
   function renderRecent() {
     if (!recentList) return;
     while (recentList.firstChild) recentList.removeChild(recentList.firstChild);
     const rows = Array.from(filled.values())
-      .filter((entry) => entry.cell !== hovered)
       .sort((a, b) => b.created_at - a.created_at)
       .slice(0, 8);
     for (const entry of rows) {
@@ -187,33 +184,30 @@ export function initPlot() {
     errorLine.textContent = '';
   }
 
+  // The entire claim bar — swatches, both inputs, and buttons — is gated on
+  // pending state via the `hidden` property (not a CSS-only hide), so it's
+  // fully out of the DOM's accessibility tree and tab order until an empty
+  // cell is clicked, exactly like the prototype's `sc-if value="{{ claiming }}"`.
   function openClaimBar(i: number) {
     if (mine !== null) return;
     if (filled.has(i)) return;
     if (pending !== null) cellButtons[pending]?.removeAttribute('data-pending');
     pending = i;
     cellButtons[i]?.setAttribute('data-pending', '');
-    if (claimBtn) {
-      claimBtn.textContent = `claim ${cellToCoord(i)}`;
-      claimBtn.hidden = false;
-    }
-    if (cancelBtn) cancelBtn.hidden = false;
+    if (claimBtn) claimBtn.textContent = `claim ${cellToCoord(i)}`;
+    if (claimBar) claimBar.hidden = false;
     clearError();
   }
 
   function closeClaimBar() {
     if (pending !== null) cellButtons[pending]?.removeAttribute('data-pending');
     pending = null;
-    if (claimBtn) claimBtn.hidden = true;
-    if (cancelBtn) cancelBtn.hidden = true;
+    if (claimBar) claimBar.hidden = true;
   }
 
   cellButtons.forEach((btn, i) => {
     btn.addEventListener('mouseenter', () => {
-      if (hovered !== i) {
-        hovered = i;
-        renderRecent();
-      }
+      hovered = i;
       showTooltipFor(i);
     });
     btn.addEventListener('click', () => openClaimBar(i));
