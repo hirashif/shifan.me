@@ -106,3 +106,57 @@ test.describe('authenticated claims — database-enforced invariants', () => {
     expect(body.cells.some((c: { cell: number }) => c.cell === CELL)).toBe(true);
   });
 });
+
+// These four all fail validation before the INSERT ever runs, so no row is
+// written and no cleanup is needed — a fresh, otherwise-unused test user is
+// enough to isolate them from the claim-flow tests above.
+test.describe('field validation rejects malformed input', () => {
+  const USER = 'test-user-plot-validation';
+
+  test('a msg containing a newline is rejected — not one line', async ({ request }) => {
+    const cookie = await sessionCookie(USER, 'tester-validation');
+    const res = await request.post('/api/plot', {
+      headers: { cookie },
+      data: { cell: 330, name: 'validator', msg: 'line one\nline two', color: '#e8b04b' },
+    });
+    expect(res.status()).toBe(400);
+    expect(await res.json()).toEqual({ error: 'one line only' });
+  });
+
+  test('a name containing a control character is rejected', async ({ request }) => {
+    const cookie = await sessionCookie(USER, 'tester-validation');
+    const res = await request.post('/api/plot', {
+      headers: { cookie },
+      data: { cell: 331, name: 'bad\tname', msg: 'hello', color: '#53d08a' },
+    });
+    expect(res.status()).toBe(400);
+    expect(await res.json()).toEqual({ error: 'no control characters' });
+  });
+
+  test('an all-zero-width msg is rejected as blank', async ({ request }) => {
+    const cookie = await sessionCookie(USER, 'tester-validation');
+    // Built from numeric code points (not a `\u`-escaped or literal
+    // character in this file) for the same reason src/pages/api/plot.ts
+    // builds ZERO_WIDTH that way: it keeps an actual zero-width character
+    // from having to appear, visibly or invisibly, in source.
+    const invisibleMsg = String.fromCharCode(0x200b, 0x200c, 0x200d, 0xfeff);
+    const res = await request.post('/api/plot', {
+      headers: { cookie },
+      data: { cell: 332, name: 'validator', msg: invisibleMsg, color: '#7dd3fc' },
+    });
+    expect(res.status()).toBe(400);
+    expect(await res.json()).toEqual({ error: 'one line, 120 chars max' });
+  });
+
+  test('a boolean cell is rejected instead of coerced to a number', async ({ request }) => {
+    const cookie = await sessionCookie(USER, 'tester-validation');
+    const res = await request.post('/api/plot', {
+      headers: { cookie },
+      // Number(true) === 1, which is a valid cell — this proves the
+      // handler requires an actual JSON number, not anything coercible.
+      data: { cell: true, name: 'validator', msg: 'hello', color: '#f472b6' },
+    });
+    expect(res.status()).toBe(400);
+    expect(await res.json()).toEqual({ error: 'bad cell' });
+  });
+});
