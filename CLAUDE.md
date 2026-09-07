@@ -58,13 +58,6 @@ Floating dock at the bottom on every page: home · writing · learnings · plot 
 - **One accent: yellow `#e8b04b`.** No other accent colors except the plot palette. Light-mode text-on-light uses `#8a6100` for contrast.
 - **Dark and light are equal citizens.** Every new element must use the CSS variables below, never hardcoded fg/bg.
 - **Boring is the point.** No gradients, no cards-with-left-borders, no emoji, no marketing copy. If it feels like a landing page, undo it.
-- **Sound is a deliberate, owner-approved exception to "boring," not a crack in the rule.** The site plays six dry, minimal
-  click/confirm sounds (from `uisfx`'s "minimal" pack, CC0, copied into `public/sfx/`) tied to six real state changes:
-  plot claim success, plot claim rejected, email copied, theme toggled, name popover opened, writing tag filter
-  clicked. See `src/lib/sound.ts` for the player. **No hover sounds, ever** (the plot grid alone is 400 cells) and no
-  page-load sound — a future change must not add either. Default is on; the dock has a mute toggle beside the theme
-  toggle, and `prefers-reduced-motion: reduce` with no stored `shifan-sound` preference starts muted. Don't strip this
-  out as a "boring" violation, and don't extend it past these six events without shifan asking.
 - **Learnings is capped at 15.** Enforce in code (build fails or test fails if length ≠ 15).
 - Keep pages count small. Don't add a page unless shifan asks. Fold new content into home or writing first.
 
