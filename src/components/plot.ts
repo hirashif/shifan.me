@@ -1,5 +1,6 @@
 import { PALETTE, cellToCoord } from '../lib/coords';
 import { fmtDate as fmtDateBase } from '../lib/date';
+import { play } from '../lib/sound';
 
 interface PlotCell {
   cell: number;
@@ -280,11 +281,13 @@ export function initPlot() {
     claimBtn.removeAttribute('disabled');
 
     if (res.status === 400) {
+      play('blocked');
       showError(await errorMessage(res));
       return;
     }
 
     if (res.status === 409) {
+      play('blocked');
       const message = await errorMessage(res);
       closeClaimBar();
       await loadPlot();
@@ -293,6 +296,7 @@ export function initPlot() {
     }
 
     if (res.status === 201) {
+      play('success');
       const data = (await res.json()) as { ok: true; cell: number };
       paintCell({ cell: data.cell, name, msg, color: selectedColor, created_at: Date.now() });
       mine = data.cell;

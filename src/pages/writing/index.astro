@@ -43,6 +43,8 @@ const tags = ['all', ...new Set(posts.map((p) => p.data.tag))];
 </Base>
 
 <script>
+  import { play } from '../../lib/sound';
+
   const chips = document.querySelectorAll<HTMLButtonElement>('[data-tag]');
   const rows = document.querySelectorAll<HTMLAnchorElement>('[data-post]');
 
@@ -58,7 +60,10 @@ const tags = ['all', ...new Set(posts.map((p) => p.data.tag))];
   }
 
   chips.forEach((chip) => {
-    chip.addEventListener('click', () => select(chip.dataset.tag ?? 'all'));
+    chip.addEventListener('click', () => {
+      play('select');
+      select(chip.dataset.tag ?? 'all');
+    });
   });
 </script>
 

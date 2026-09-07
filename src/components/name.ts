@@ -1,3 +1,5 @@
+import { play } from '../lib/sound';
+
 const GLYPHS = 'abcdefghijklmnopqrstuvwxyz$#%&*';
 const TARGET = 'shifan';
 
@@ -27,6 +29,7 @@ export function initName() {
     if (!tip) return;
     tip.hidden = !open;
     btn.setAttribute('aria-expanded', String(open));
+    if (open) play('open');
   };
 
   btn.addEventListener('click', (e) => {

@@ -20,6 +20,10 @@ const ICONS: Record<string, string> = {
     '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>',
   moon:
     '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>',
+  speaker:
+    '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 9v6h4l5 4V5L8 9H4z"></path><path d="M16.5 9.5a4 4 0 0 1 0 5"></path><path d="M19 7a7.5 7.5 0 0 1 0 10"></path></svg>',
+  speakerMute:
+    '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 9v6h4l5 4V5L8 9H4z"></path><path d="M16.5 9.5l5 5"></path><path d="M21.5 9.5l-5 5"></path></svg>',
 };
 
 const path = Astro.url.pathname;
@@ -47,6 +51,10 @@ const items = [
   <button type="button" aria-label="toggle theme" data-tip="toggle theme" data-theme-toggle class="dock-item">
     <span data-theme-icon="dark"><Fragment set:html={ICONS.sun} /></span>
     <span data-theme-icon="light" style="display:none"><Fragment set:html={ICONS.moon} /></span>
+  </button>
+  <button type="button" aria-label="mute sounds" aria-pressed="false" data-tip="mute sounds" data-sound-toggle class="dock-item">
+    <span data-sound-icon="on"><Fragment set:html={ICONS.speaker} /></span>
+    <span data-sound-icon="off" style="display:none"><Fragment set:html={ICONS.speakerMute} /></span>
   </button>
 </nav>
 
@@ -81,16 +89,18 @@ const items = [
   }
 
   @media (max-width: 640px) {
-    /* Ten items (five pages, a divider, then github/linkedin/email/theme)
-       no longer fit at the desktop item size and gap within a 375px
-       viewport — the row ran wider than the dock's own scroll box. Rather
-       than drop an item, shrink the item size, gap, and padding at this
-       breakpoint so the whole row fits with room to spare; overflow-x:auto
-       below stays as a safety net for narrower viewports, not the primary
-       fit strategy. */
+    /* Eleven items (five pages, a divider, then github/linkedin/email/
+       theme/sound) no longer fit at the desktop item size and gap within a
+       375px viewport — the row ran wider than the dock's own scroll box.
+       Rather than drop an item, shrink the item size, gap, and padding at
+       this breakpoint so the whole row fits with room to spare;
+       overflow-x:auto below stays as a safety net for narrower viewports,
+       not the primary fit strategy. (Adding the sound toggle pushed the
+       count from ten to eleven, so this was tightened again from the
+       34px/1px/5px values the ten-item dock used.) */
     .dock-nav {
       max-width: calc(100vw - 24px);
-      padding: 5px;
+      padding: 4px;
       gap: 1px;
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
@@ -99,11 +109,11 @@ const items = [
     .dock-nav::-webkit-scrollbar { display: none; }
     .dock-item {
       flex: none;
-      width: 34px;
-      height: 34px;
+      width: 30px;
+      height: 30px;
     }
     .divider {
-      margin: 5px 3px;
+      margin: 4px 2px;
     }
     /* Hover-only lift/tooltip fights touch: taps register as both hover
        and click on many mobile browsers, which pops the tooltip and jumps
@@ -121,14 +131,17 @@ const items = [
 </style>
 
 <script>
-  import { initTheme, initShortcuts } from './dock';
+  import { initTheme, initShortcuts, initSound } from './dock';
+  import { play } from '../lib/sound';
   initTheme();
   initShortcuts();
+  initSound();
 
   const btn = document.querySelector<HTMLButtonElement>('[data-copy-email]');
   btn?.addEventListener('click', async () => {
     const address = ['shifan.hirani', 'gmail.com'].join('@');
     try { await navigator.clipboard.writeText(address); } catch { return; }
+    play('copy');
     const bubble = document.createElement('span');
     bubble.textContent = 'copied';
     bubble.className = 'copied-bubble';

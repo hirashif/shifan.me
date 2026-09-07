@@ -1,3 +1,5 @@
+import { isMuted, play, toggleMuted } from '../lib/sound';
+
 const KEY = 'shifan-theme';
 
 function current(): 'dark' | 'light' {
@@ -16,6 +18,27 @@ export function setTheme(next: 'dark' | 'light') {
 
 export function toggleTheme() {
   setTheme(current() === 'dark' ? 'light' : 'dark');
+  play('toggle');
+}
+
+function renderSoundButton(btn: HTMLButtonElement) {
+  const muted = isMuted();
+  btn.setAttribute('aria-pressed', String(muted));
+  btn.setAttribute('aria-label', muted ? 'unmute sounds' : 'mute sounds');
+  btn.dataset.tip = muted ? 'unmute sounds' : 'mute sounds';
+  document.querySelectorAll<HTMLElement>('[data-sound-icon]').forEach((el) => {
+    el.style.display = el.dataset.soundIcon === (muted ? 'off' : 'on') ? '' : 'none';
+  });
+}
+
+export function initSound() {
+  const btn = document.querySelector<HTMLButtonElement>('[data-sound-toggle]');
+  if (!btn) return;
+  renderSoundButton(btn);
+  btn.addEventListener('click', () => {
+    toggleMuted();
+    renderSoundButton(btn);
+  });
 }
 
 export function initTheme() {
