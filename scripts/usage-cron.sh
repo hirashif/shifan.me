@@ -1,48 +1,76 @@
 #!/bin/bash
 # Pushes a Claude Code usage snapshot to shifan.me's footer.
 #
-# Run by the launchd agent me.shifan.usage-push (see scripts/me.shifan.usage-push.plist).
-# ccusage reads ~/.claude/projects/**/*.jsonl, so this can only ever run on shifan's
-# own machine — a cloud cron has no access to those files.
+# Deliberately self-contained and living OUTSIDE ~/Documents.
+# A macOS LaunchAgent cannot read ~/Documents without Full Disk Access
+# (TCC), which is why the previous version of this job — which lived in
+# the repo — failed every run with "Operation not permitted". Granting
+# /bin/bash Full Disk Access would have been a far broader permission
+# than this job needs, so nothing here touches a protected directory:
+#   - reads ~/.claude/projects  (not TCC-protected)
+#   - reads ~/.config/shifan/usage-token
+#   - writes /tmp
 #
-# To run by hand:      ./scripts/usage-cron.sh
-# To watch the log:    tail -f /tmp/shifan-usage-push.log
+# Run by hand:   ~/.local/bin/shifan-usage-push.sh
+# Watch the log: tail -f /tmp/shifan-usage-push.log
 
 set -uo pipefail
 
-REPO="/Users/shifanhirani/Documents/GitHub/shifan.me"
 LOG="/tmp/shifan-usage-push.log"
-export PATH="/Users/shifanhirani/.local/bin:/usr/local/bin:/usr/bin:/bin"
+TOKEN_FILE="$HOME/.config/shifan/usage-token"
+ENDPOINT="https://shifan.me/api/usage"
+export PATH="$HOME/.local/bin:/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin"
+cd /tmp || exit 1
 
-cd "$REPO" || { echo "$(date '+%F %T') repo not found at $REPO" >>"$LOG"; exit 1; }
+log() { echo "$(date '+%F %T') $*" >>"$LOG"; }
 
-# The token lives only in .dev.vars, which is gitignored. Never echo it.
-if [ ! -f .dev.vars ]; then
-  echo "$(date '+%F %T') .dev.vars missing, cannot authenticate" >>"$LOG"
+[ -r "$TOKEN_FILE" ] || { log "FAILED: token file unreadable at $TOKEN_FILE"; exit 1; }
+TOKEN=$(tr -d '\n' < "$TOKEN_FILE")
+[ -n "$TOKEN" ] || { log "FAILED: token file is empty"; exit 1; }
+
+YEAR_START="$(date '+%Y')0101"
+raw=$(npx -y ccusage@latest daily --json --offline --since "$YEAR_START" 2>/dev/null)
+if [ -z "$raw" ]; then
+  log "FAILED: ccusage returned nothing"
   exit 1
 fi
-USAGE_TOKEN=$(grep '^USAGE_TOKEN=' .dev.vars | cut -d= -f2- | tr -d '"' | tr -d "'")
-if [ -z "$USAGE_TOKEN" ]; then
-  echo "$(date '+%F %T') USAGE_TOKEN not set in .dev.vars" >>"$LOG"
-  exit 1
-fi
-export USAGE_TOKEN
-export USAGE_ENDPOINT="https://shifan.me/api/usage"
 
-out=$(pnpm usage:push 2>&1)
-status=$?
+# Aggregate on LOCAL calendar days — ccusage buckets by local day, so using
+# UTC here would report $0.00 for several hours after local midnight.
+payload=$(printf '%s' "$raw" | python3 -c '
+import sys, json, datetime
+d = json.load(sys.stdin)
+days = d.get("daily", [])
+today = datetime.date.today()
+week_ago = today - datetime.timedelta(days=6)
+def s(rows, k): return sum(r.get(k, 0) or 0 for r in rows)
+td = [r for r in days if r.get("period") == today.isoformat()]
+wk = [r for r in days if r.get("period", "") >= week_ago.isoformat()]
+print(json.dumps({
+    "today": round(s(td, "totalCost"), 2),
+    "week": round(s(wk, "totalCost"), 2),
+    "year": round(s(days, "totalCost"), 2),
+    "tokensToday": s(td, "totalTokens"),
+    "date": today.isoformat(),
+}))
+') || { log "FAILED: could not parse ccusage output"; exit 1; }
 
-# Log the endpoint's reply, which contains the figures but no secret.
-if [ $status -eq 0 ]; then
-  echo "$(date '+%F %T') ok  $(echo "$out" | tail -1)" >>"$LOG"
+resp=$(curl -sS --max-time 60 -w '\n%{http_code}' -X POST "$ENDPOINT" \
+  -H "authorization: Bearer $TOKEN" \
+  -H 'content-type: application/json' \
+  -d "$payload" 2>&1)
+code=$(printf '%s' "$resp" | tail -1)
+body=$(printf '%s' "$resp" | sed '$d')
+
+if [ "$code" = "200" ]; then
+  log "ok  $body"
 else
-  echo "$(date '+%F %T') FAILED (exit $status)" >>"$LOG"
-  echo "$out" | tail -5 | sed 's/^/    /' >>"$LOG"
+  # Never log the token; the body carries figures only.
+  log "FAILED: http $code  $body"
+  exit 1
 fi
 
-# Keep the log from growing without bound.
-if [ -f "$LOG" ] && [ "$(wc -l <"$LOG")" -gt 500 ]; then
-  tail -200 "$LOG" >"$LOG.tmp" && mv "$LOG.tmp" "$LOG"
+# Keep the log bounded.
+if [ "$(wc -l <"$LOG" 2>/dev/null || echo 0)" -gt 400 ]; then
+  tail -150 "$LOG" >"$LOG.tmp" && mv "$LOG.tmp" "$LOG"
 fi
-
-exit $status
