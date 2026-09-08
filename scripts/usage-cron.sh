@@ -9,16 +9,24 @@
 # than this job needs, so nothing here touches a protected directory:
 #   - reads ~/.claude/projects  (not TCC-protected)
 #   - reads ~/.config/shifan/usage-token
+#   - writes ~/.config/shifan/litellm-rates.json (rate-table cache)
 #   - writes /tmp
 #
-# Run by hand:   ~/.local/bin/shifan-usage-push.sh
+# The aggregation itself is usage-snapshot.py, which must sit next to this
+# file. In the repo that's scripts/; installed it's ~/.local/bin/. Install
+# or update both with:
+#   cp scripts/usage-cron.sh ~/.local/bin/shifan-usage-push.sh
+#   cp scripts/usage-snapshot.py ~/.local/bin/usage-snapshot.py
+#
+# Run by hand:   ~/.local/bin/shifan-usage-push.sh   (or `pnpm usage:push`)
 # Watch the log: tail -f /tmp/shifan-usage-push.log
 
 set -uo pipefail
 
 LOG="/tmp/shifan-usage-push.log"
 TOKEN_FILE="$HOME/.config/shifan/usage-token"
-ENDPOINT="https://shifan.me/api/usage"
+ENDPOINT="${USAGE_ENDPOINT:-https://shifan.me/api/usage}"
+SNAPSHOT="$(cd "$(dirname "$0")" && pwd)/usage-snapshot.py"
 export PATH="$HOME/.local/bin:/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin"
 cd /tmp || exit 1
 
@@ -27,33 +35,12 @@ log() { echo "$(date '+%F %T') $*" >>"$LOG"; }
 [ -r "$TOKEN_FILE" ] || { log "FAILED: token file unreadable at $TOKEN_FILE"; exit 1; }
 TOKEN=$(tr -d '\n' < "$TOKEN_FILE")
 [ -n "$TOKEN" ] || { log "FAILED: token file is empty"; exit 1; }
+[ -r "$SNAPSHOT" ] || { log "FAILED: aggregator missing at $SNAPSHOT"; exit 1; }
 
-YEAR_START="$(date '+%Y')0101"
-raw=$(npx -y ccusage@latest daily --json --offline --since "$YEAR_START" 2>/dev/null)
-if [ -z "$raw" ]; then
-  log "FAILED: ccusage returned nothing"
-  exit 1
-fi
-
-# Aggregate on LOCAL calendar days — ccusage buckets by local day, so using
-# UTC here would report $0.00 for several hours after local midnight.
-payload=$(printf '%s' "$raw" | python3 -c '
-import sys, json, datetime
-d = json.load(sys.stdin)
-days = d.get("daily", [])
-today = datetime.date.today()
-week_ago = today - datetime.timedelta(days=6)
-def s(rows, k): return sum(r.get(k, 0) or 0 for r in rows)
-td = [r for r in days if r.get("period") == today.isoformat()]
-wk = [r for r in days if r.get("period", "") >= week_ago.isoformat()]
-print(json.dumps({
-    "today": round(s(td, "totalCost"), 2),
-    "week": round(s(wk, "totalCost"), 2),
-    "year": round(s(days, "totalCost"), 2),
-    "tokensToday": s(td, "totalTokens"),
-    "date": today.isoformat(),
-}))
-') || { log "FAILED: could not parse ccusage output"; exit 1; }
+# stderr (rate-fetch fallback notices, unpriced-model warnings) goes to the
+# log so a silent $0 for a new model is visible, not swallowed.
+payload=$(python3 "$SNAPSHOT" 2>>"$LOG") || { log "FAILED: usage-snapshot.py exited non-zero"; exit 1; }
+[ -n "$payload" ] || { log "FAILED: usage-snapshot.py returned nothing"; exit 1; }
 
 resp=$(curl -sS --max-time 60 -w '\n%{http_code}' -X POST "$ENDPOINT" \
   -H "authorization: Bearer $TOKEN" \

@@ -5,14 +5,14 @@ export interface UsageSnapshot {
   tokensToday: number;
   updatedAt: number;
   // The local YYYY-MM-DD day `today`/`tokensToday` cover, per
-  // scripts/push-usage.ts. Optional: a snapshot written before this field
+  // scripts/usage-snapshot.py. Optional: a snapshot written before this field
   // existed (the one already in production KV, for instance) simply
   // doesn't have one.
   date?: string;
 }
 
-// A snapshot is only ever pushed once a day by scripts/push-usage.ts run by
-// hand. If that stops happening — the machine is off, the script breaks —
+// A snapshot is pushed hourly by scripts/usage-cron.sh under launchd. If
+// that stops happening — the machine is off, the script breaks —
 // the number in KV goes stale. Presenting a week-old dollar figure as
 // "today" would be a quiet lie, so anything older than this is treated as
 // having no figure to show at all.
@@ -25,8 +25,8 @@ export function isStale(updatedAt: number, now: number = Date.now()): boolean {
   return updatedAt <= 0 || now - updatedAt > STALE_MS;
 }
 
-// Mirrors the local-date logic in scripts/push-usage.ts (a different
-// runtime — Node vs. this browser bundle — so it isn't shared code, just
+// Mirrors the local-date logic in scripts/usage-snapshot.py (a different
+// runtime — Python vs. this browser bundle — so it isn't shared code, just
 // the same approach): local getters, not `toISOString` (always UTC), so a
 // viewer whose local day has already rolled over past UTC midnight (or not
 // yet reached it) is compared against their own calendar day, not UTC's.

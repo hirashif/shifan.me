@@ -13,7 +13,7 @@
     "deploy": "astro build && wrangler deploy",
     "typecheck": "wrangler types && astro check && tsc --noEmit",
     "test": "playwright test",
-    "usage:push": "tsx scripts/push-usage.ts",
+    "usage:push": "bash scripts/usage-cron.sh",
     "astro": "astro"
   },
   "dependencies": {
@@ -33,9 +33,7 @@
     "@playwright/test": "^1.62.1",
     "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^26.4.1",
-    "ccusage": "^20.0.20",
     "tailwindcss": "^4.3.3",
-    "tsx": "^4.23.13",
     "typescript": "^6.0.3",
     "wrangler": "^4.128.0"
   }

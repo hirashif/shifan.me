@@ -31,7 +31,7 @@ function coerceNonNegative(v: unknown): number {
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 // The local YYYY-MM-DD day `today`/`tokensToday` describe, per
-// scripts/push-usage.ts. Anything that isn't exactly that shape (missing,
+// scripts/usage-snapshot.py. Anything that isn't exactly that shape (missing,
 // wrong type, malformed) is dropped rather than stored — an unparseable
 // date is worse than no date, since tokens.ts treats a missing date as
 // "unknown, dash it out" but would mis-render a garbage string as-is.
