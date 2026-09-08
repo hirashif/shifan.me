@@ -6,7 +6,8 @@ This is shifan's personal website. Domain: **shifan.me** (replaces hirashif.gith
 
 A small, fast, mostly-static personal site with a few live bits:
 
-- **/** — home. name (scramble-in), one-line tagline, live uptime counter (years since 2002-11-26, 9 decimals), work timeline, "a few things i've learned" teaser (3 lines, links to /learnings), writing list (7 latest), projects grid, **the plot** (pixel guestbook, 40×10), clickable stack chips, footer with live token spend.
+- **/** — home, in this section order: header (name scramble-in, tagline, live uptime counter — years since 2002-11-26, 9 decimals) · work · learned (3-line teaser linking to /learnings) · writing (7 latest) · projects · **the plot** (pixel guestbook, 40×10) · stack · education · contributions · footer (live token spend).
+  Stack chips are **display-only** — shifan explicitly asked that clicking do nothing. Do not re-add the click-to-reveal note card.
 - **/writing** — long-form posts. tag filter. markdown/MDX source.
 - **/learnings** — exactly 15 one-liners. no dates, no tags, no filters. when a new one is added, an old one is removed. mix of life and work.
 - **/plot** — the full pixel guestbook + recent claims list.
@@ -84,37 +85,42 @@ Motion: sections `fadeUp .6s cubic-bezier(.2,.7,.2,1)` staggered by 60–80ms. D
 
 Keyboard: `t` toggles theme, `g` jumps to the plot. Ignore when focus is in an input.
 
-## Stack (recommended — confirm with shifan before deviating)
+## Stack (as built — this is what exists, not a recommendation)
 
-- **Astro** (static-first, islands for the interactive bits) **or Next.js app router**. Prefer Astro unless the plot's auth pushes toward Next. Either way: TypeScript, Tailwind v4 with the tokens above as CSS variables (`@theme`), no component library — the design is ~12 primitives and a library would fight the look.
-- **Fonts:** `geist` npm package (Geist + Geist Mono), self-hosted. No Google Fonts at runtime.
-- **Icons:** dock icons are inline SVGs in the design (copy them). Stack chip icons from `simple-icons` package, rendered as inline SVG at build time — not hotlinked from a CDN.
-- **Content:** `content/learnings.ts` (array of 15 strings), `content/writing/*.mdx`, `content/projects.ts`, `content/work.ts`. Frontmatter for posts: `title, date, tag, minutes, excerpt`.
-- **Theme:** class on `<html>` (`dark`/`light`), persisted in `localStorage['shifan-theme']`, read before first paint via inline script to avoid flash. Default dark.
-- **The plot:** needs a backend. `plot` table: `cell int pk (0–399), user_id, name, msg (≤120 chars), color (one of palette), created_at`. One row per github user (unique on user_id). Auth: GitHub OAuth (Auth.js or Clerk). API: `GET /api/plot` (all cells), `POST /api/plot` (claim; rejects if user already has one or cell taken). Hover tooltip shows msg · name · date · coord. Coord = row letter a–j + column 1–40.
-- **Token spend:** `GET /api/tokens` returns `{ today, week, year, tokensToday }` in USD from the Anthropic usage/cost API (or a cron that writes to a KV). Cache 5 minutes. Footer shows today; hover card shows all four. Never expose the API key client-side.
-- **GitHub "last commit" (optional, not in current design):** skip unless asked.
-- **Deploy:** Vercel (or Cloudflare Pages). `shifan.me` apex + `www` redirect. Set `<meta name="theme-color">` to `#0a0a0b`.
-- **Analytics:** none, or Plausible if asked. No cookies banner needed then.
+- **Astro 7** (7.3.1), TypeScript, deployed as a **Cloudflare Worker** via `@astrojs/cloudflare` (pinned 14.3.0). Static-first: every page is prerendered, only `/api/*` sets `prerender = false`.
+- **Tailwind v4 is installed but effectively unused** — 3 utility classes site-wide, no `@theme`. Design tokens are plain CSS custom properties on `.th-dark`/`.th-light` in `src/styles/global.css`. Before removing Tailwind, note that `global.css` now defines its own explicit `[hidden] { display:none !important }` rule; that used to be inherited from Tailwind preflight and 7 elements depend on it.
+- **Fonts:** `@fontsource-variable/geist` + `geist-mono`, self-hosted. No Google Fonts at runtime.
+- **Icons:** dock icons are hand-drawn inline SVGs. Stack chips use `simple-icons` inlined at build via Vite `?raw`. Company logos in the work timeline are self-hosted PNGs in `public/logos/` (fetched from each org's own site — never hotlink).
+- **Content:** `src/content/learnings.ts` (exactly 15, build-time `throw` enforces it), `writing/*.mdx`, `projects.ts`, `work.ts`, `stack.ts`, `education.ts`.
+- **Theme:** class on `<html>` (`th-dark`/`th-light`), `localStorage['shifan-theme']`, applied pre-paint by an inline script. Default dark.
+- **The plot:** Cloudflare **D1** (`shifan-plot`). Table `plot(cell INTEGER PRIMARY KEY 0-399, user_id TEXT UNIQUE, name, msg ≤120, color, created_at)`. Both invariants — one claim per cell, one per person — are enforced by **database constraints**, not app logic, so concurrent claims resolve as a constraint violation mapped to 409. Never rewrite these as read-then-write checks.
+  **There is no GitHub OAuth.** It was built, then removed at shifan's request because the sign-in redirect lost form state and was friction. Identity is now an anonymous HMAC-signed `shifan_visitor` cookie minted on first claim. Clearing cookies gets you another pixel; that is the accepted tradeoff. `src/lib/session-core.ts` still holds the signing crypto.
+- **Token spend:** `GET /api/tokens` reads a snapshot from Cloudflare **KV**. It is NOT the Anthropic cost API — shifan is on a Claude Code subscription, which that API cannot see. An hourly launchd job at `~/.local/bin/shifan-usage-push.sh` runs `ccusage` over `~/.claude/projects` and POSTs to `/api/usage`. The script deliberately lives outside `~/Documents`: a LaunchAgent cannot read it there without Full Disk Access (macOS TCC), which broke the first version.
+  **The footer copy must stay honest.** It reads "counted from my claude code logs, priced at api rates." The original design said "straight from the api bill" — that is false and must not come back. There is no fake ticker; the number changes only when a snapshot is pushed, and it dashes out rather than showing a stale figure as "today".
+- **Contributions chart:** `GET /api/contributions` scrapes GitHub's public contributions HTML for `hirashif`, caches in KV for 6h, renders ~26 weeks as our own grid so it themes correctly. Never fabricate contribution counts.
+- **Deploy:** `pnpm build && pnpm exec wrangler deploy`. **Build before deploying** — the adapter regenerates `dist/server/wrangler.json` at build time, and deploying stale silently drops config. `shifan.me` is bound as a custom domain; `www` → apex is a Cloudflare Redirect Rule (dashboard, not in this repo).
+- **SEO:** OG + Twitter meta per page in `Base.astro`, `public/og.png` (1200×630, regenerate with `node scripts/gen-og.mjs` after changing the tagline — the copy is baked into the image). Sitemap via `@astrojs/sitemap`, which **must keep excluding the resume**. `public/robots.txt` allows everything including AI crawlers; Cloudflare's "Managed robots.txt" is deliberately OFF.
+- **Analytics:** none. Cloudflare Web Analytics is the intended option if wanted — free and cookieless, so no consent banner.
 
 ## Frontend tooling Claude Code should use
 
 - `pnpm`. Scripts: `dev`, `build`, `preview`, `lint` (eslint + prettier), `typecheck`, `test`.
-- **Playwright** for the handful of things that matter: no "hirani" in rendered HTML, learnings count = 15, theme toggle flips class + persists, plot claim flow, `t`/`g` shortcuts, no console errors on each route.
-- **Lighthouse CI** budget: perf ≥ 95, a11y ≥ 95. Dock buttons need `aria-label`s (the visual tooltip is not enough).
+- **Playwright**, 131 tests. Load-bearing ones: surname absent from rendered *visible text* (hrefs and the email are allowed), learnings count = 15, theme persists, plot claim flow, `t`/`g` shortcuts, no console errors per route, no horizontal overflow at 375px, resume not indexed, sitemap excludes the resume, redirect stubs intact.
+- **Lighthouse CI is NOT wired up.** perf ≥ 95 / a11y ≥ 95 remains the intent, but nothing enforces it — it was left out as too flaky on shared CI runners. Do not describe it as a gate. Dock buttons still need real `aria-label`s; the visual tooltip is not an accessible name.
+- CI runs on push/PR via `.github/workflows/ci.yml`: typecheck, build, Playwright. It must keep working on a clean clone with no `.dev.vars` and no Cloudflare credentials.
+- Astro's dev toolbar is disabled under test (`ASTRO_DEV_TOOLBAR=0`); it injected extra `<h1>`s and made the suite flaky.
 - Use `astro check` / `tsc --noEmit` before every commit.
 - For visual diffs against the prototypes, screenshot the `.dc.html` files in `design_handoff/` at 940px wide and compare side by side.
 
-## Content sources
+## Content sources (done — kept for provenance)
 
-Shifan will provide his resume and LinkedIn. Use them to replace placeholders:
-- work timeline dates + descriptions (paycom dates, university name/degree/years — currently `your university`, `20xx`)
-- project descriptions (current ones are inferred from repos — verify)
-- learnings (current 15 are drafts in his voice — he will rewrite)
-- the name tooltip copy ("from the arabic shifā, 'healing'. my mom picked it…") — confirm wording
-- writing posts (titles exist on the old site; bodies need migrating from hirashif.github.io/writeups)
+Work history matches his LinkedIn: paycom (sep 2024 – may 2026), alpha kappa psi, resi media ×2, aga khan foundation. Education is texas a&m only; the high school was removed at his request. `software developer II` is an approved uppercase exception.
 
-Anything from the resume that would break a hard rule above (last name, "download resume") does not go on the site.
+Writing posts were migrated from hirashif.github.io/writeups with slugs preserved one-to-one, because the old site redirects onto them. **Post dates are author-assigned, not derived from git** — the real history shows all seven landing in one commit.
+
+The 15 learnings are shifan's own, apart from the last five which he asked to be written to a brief ("general but applicable in science and tech"). He may rewrite them; confirm which one drops before adding a new one.
+
+The name popover is settled: `shifan, from the arabic shifā (شفاء), "healing."` and nothing more. He rejected a "god's gift" variant (unsupported by the etymology), a reference to his mom, and a birthday fact.
 
 ## Working with shifan
 
