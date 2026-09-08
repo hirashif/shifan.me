@@ -2,11 +2,22 @@ import { test, expect } from '@playwright/test';
 
 test('every dock control has an accessible name', async ({ page }) => {
   await page.goto('/');
-  for (const name of ['home', 'writing', 'learnings', 'the plot', 'github', 'linkedin', 'copy email', 'toggle theme']) {
+  for (const name of ['home', 'writing', 'learnings', 'the plot', 'resume', 'github', 'linkedin', 'copy email', 'book a call', 'toggle theme']) {
     // Dock controls are a mix of <a> (role "link") and <button> (role "button");
     // getByRole only accepts a single literal role, so check both via .or().
     const control = page.getByRole('link', { name }).or(page.getByRole('button', { name }));
     await expect(control.first()).toBeVisible();
+  }
+});
+
+test('book a call links to cal.com and opens in a new tab', async ({ page }) => {
+  for (const route of ['/', '/writing', '/learnings', '/plot']) {
+    await page.goto(route);
+    const link = page.locator('nav[aria-label="site"]').getByRole('link', { name: 'book a call' });
+    await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute('href', 'https://cal.com/shifan/15min');
+    await expect(link).toHaveAttribute('target', '_blank');
+    await expect(link).toHaveAttribute('rel', /noopener/);
   }
 });
 

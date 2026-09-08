@@ -16,6 +16,10 @@ const ICONS: Record<string, string> = {
     '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.11 20.45H3.56V9h3.55v11.45z"></path></svg>',
   mail:
     '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="5" width="19" height="14" rx="2.5"></rect><path d="M3.5 6.5 12 13l8.5-6.5"></path></svg>',
+  // Not from the prototype — drawn to match the mail/resume icons above
+  // (same viewBox, size, and stroke).
+  calendar:
+    '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2.5"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg>',
   sun:
     '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>',
   moon:
@@ -44,6 +48,7 @@ const items = [
   <a href="https://github.com/hirashif" aria-label="github" data-tip="github" class="dock-item" target="_blank" rel="noopener"><Fragment set:html={ICONS.github} /></a>
   <a href="https://linkedin.com/in/shifanhirani" aria-label="linkedin" data-tip="linkedin" class="dock-item" target="_blank" rel="noopener"><Fragment set:html={ICONS.linkedin} /></a>
   <button type="button" aria-label="copy email" data-tip="copy email" data-copy-email class="dock-item"><Fragment set:html={ICONS.mail} /></button>
+  <a href="https://cal.com/shifan/15min" aria-label="book a call" data-tip="book a call" class="dock-item" target="_blank" rel="noopener"><Fragment set:html={ICONS.calendar} /></a>
   <button type="button" aria-label="toggle theme" data-tip="toggle theme" data-theme-toggle class="dock-item">
     <span data-theme-icon="dark"><Fragment set:html={ICONS.sun} /></span>
     <span data-theme-icon="light" style="display:none"><Fragment set:html={ICONS.moon} /></span>
@@ -81,13 +86,14 @@ const items = [
   }
 
   @media (max-width: 640px) {
-    /* Ten items (five pages, a divider, then github/linkedin/email/theme)
-       no longer fit at the desktop item size and gap within a 375px
-       viewport — the row ran wider than the dock's own scroll box. Rather
-       than drop an item, shrink the item size, gap, and padding at this
-       breakpoint so the whole row fits with room to spare; overflow-x:auto
-       below stays as a safety net for narrower viewports, not the primary
-       fit strategy. */
+    /* Eleven items (five pages, a divider, then github/linkedin/email/
+       call/theme) no longer fit at the desktop item size and gap within a
+       375px viewport — the row ran wider than the dock's own scroll box.
+       Rather than drop an item, shrink the item size, gap, and padding at
+       this breakpoint so the whole row fits (10 × 32px + gaps + divider +
+       padding ≈ 347px inside the 351px box); overflow-x:auto below stays
+       as a safety net for narrower viewports, not the primary fit
+       strategy. */
     .dock-nav {
       max-width: calc(100vw - 24px);
       padding: 5px;
@@ -99,8 +105,8 @@ const items = [
     .dock-nav::-webkit-scrollbar { display: none; }
     .dock-item {
       flex: none;
-      width: 34px;
-      height: 34px;
+      width: 32px;
+      height: 32px;
     }
     .divider {
       margin: 5px 3px;
