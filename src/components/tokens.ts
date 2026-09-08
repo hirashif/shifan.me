@@ -1,7 +1,11 @@
 export interface UsageSnapshot {
   today: number;
   week: number;
-  year: number;
+  // Rolling 90 days, the same window T3 Code's usage panel defaults to.
+  // Was `year` (since jan 1), but the local logs only reach back ~3 months
+  // anyway (claude code prunes transcripts), so a calendar-year label
+  // overstated what the number covered.
+  quarter: number;
   tokensToday: number;
   updatedAt: number;
   // The local YYYY-MM-DD day `today`/`tokensToday` cover, per
@@ -68,29 +72,29 @@ export async function initTokenFooter(): Promise<void> {
   const amountEl = root.querySelector<HTMLElement>('[data-tok-amount]');
   const cardToday = root.querySelector<HTMLElement>('[data-tok-card-today]');
   const cardWeek = root.querySelector<HTMLElement>('[data-tok-card-week]');
-  const cardYear = root.querySelector<HTMLElement>('[data-tok-card-year]');
+  const cardQuarter = root.querySelector<HTMLElement>('[data-tok-card-quarter]');
   const cardTokens = root.querySelector<HTMLElement>('[data-tok-card-tokens]');
   const card = root.querySelector<HTMLElement>('[data-tok-card]');
   const wrap = root.querySelector<HTMLElement>('[data-tok-wrap]');
-  if (!amountEl || !cardToday || !cardWeek || !cardYear || !cardTokens || !card || !wrap) return;
+  if (!amountEl || !cardToday || !cardWeek || !cardQuarter || !cardTokens || !card || !wrap) return;
 
   const render = (snap: UsageSnapshot) => {
     if (isStale(snap.updatedAt)) {
       amountEl.textContent = DASH;
       cardToday.textContent = DASH;
       cardWeek.textContent = DASH;
-      cardYear.textContent = DASH;
+      cardQuarter.textContent = DASH;
       cardTokens.textContent = DASH;
       return;
     }
-    // `week` and `year` don't describe a single calendar day, so a day
+    // `week` and `quarter` don't describe a single calendar day, so a day
     // rollover doesn't make them wrong — only `today`/`tokensToday` get
     // dashed when the snapshot's date no longer matches the viewer's.
     const rollover = isRollover(snap.date);
     amountEl.textContent = rollover ? DASH : fmtUsd(snap.today);
     cardToday.textContent = rollover ? DASH : fmtUsd(snap.today);
     cardWeek.textContent = fmtUsd(snap.week);
-    cardYear.textContent = fmtUsd(snap.year);
+    cardQuarter.textContent = fmtUsd(snap.quarter);
     cardTokens.textContent = rollover ? DASH : fmtTokenCount(snap.tokensToday);
   };
 

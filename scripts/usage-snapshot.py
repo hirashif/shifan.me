@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Aggregate Claude Code usage from local logs into the footer snapshot.
 
-Prints one JSON object: {today, week, year, tokensToday, date}.
+Prints one JSON object: {today, week, quarter, tokensToday, date}.
+`quarter` is a rolling 90 days, the window T3 Code's panel defaults to.
 
 Mirrors T3 Code's usage panel so the two agree to the cent:
   - reads every ~/.claude/projects/**/*.jsonl
@@ -116,13 +117,13 @@ def main():
 
     today = datetime.date.today()
     week_ago = (today - datetime.timedelta(days=6)).isoformat()
-    year_start = today.replace(month=1, day=1).isoformat()
+    quarter_ago = (today - datetime.timedelta(days=89)).isoformat()
     t = today.isoformat()
 
     snapshot = {
         'today': round(cost_by_day.get(t, 0.0), 2),
         'week': round(sum(v for d, v in cost_by_day.items() if d >= week_ago), 2),
-        'year': round(sum(v for d, v in cost_by_day.items() if d >= year_start), 2),
+        'quarter': round(sum(v for d, v in cost_by_day.items() if d >= quarter_ago), 2),
         'tokensToday': tokens_by_day.get(t, 0),
         'date': t,
     }

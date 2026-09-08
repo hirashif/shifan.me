@@ -6,7 +6,7 @@ export const prerender = false;
 // Zero snapshot: the honest default when nothing has been pushed to KV yet.
 // The client (src/components/tokens.ts) treats `updatedAt: 0` as maximally
 // stale and renders `—` rather than presenting these zeros as a real figure.
-const EMPTY = { today: 0, week: 0, year: 0, tokensToday: 0, updatedAt: 0 };
+const EMPTY = { today: 0, week: 0, quarter: 0, tokensToday: 0, updatedAt: 0 };
 
 export const GET: APIRoute = async () => {
   const raw = await env.USAGE.get('usage:latest');

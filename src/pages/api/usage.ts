@@ -56,7 +56,7 @@ export const POST: APIRoute = async ({ request }) => {
   const snapshot = {
     today: coerceNonNegative(body.today),
     week: coerceNonNegative(body.week),
-    year: coerceNonNegative(body.year),
+    quarter: coerceNonNegative(body.quarter),
     tokensToday: coerceNonNegative(body.tokensToday),
     updatedAt: Date.now(),
     date: coerceDate(body.date),

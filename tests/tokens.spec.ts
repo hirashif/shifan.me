@@ -43,7 +43,7 @@ test.describe('GET /api/tokens', () => {
     const res = await request.get('/api/tokens');
     expect(res.status()).toBe(200);
     const body = await res.json();
-    for (const k of ['today', 'week', 'year', 'tokensToday', 'updatedAt']) {
+    for (const k of ['today', 'week', 'quarter', 'tokensToday', 'updatedAt']) {
       expect(body).toHaveProperty(k);
     }
   });
@@ -56,20 +56,20 @@ test.describe('GET /api/tokens', () => {
     );
     const res = await request.get('/api/tokens');
     expect(res.status()).toBe(200);
-    expect(await res.json()).toEqual({ today: 0, week: 0, year: 0, tokensToday: 0, updatedAt: 0 });
+    expect(await res.json()).toEqual({ today: 0, week: 0, quarter: 0, tokensToday: 0, updatedAt: 0 });
   });
 });
 
 test.describe('POST /api/usage auth', () => {
   test('without the bearer token is rejected', async ({ request }) => {
-    const res = await request.post('/api/usage', { data: { today: 1, week: 1, year: 1, tokensToday: 1 } });
+    const res = await request.post('/api/usage', { data: { today: 1, week: 1, quarter: 1, tokensToday: 1 } });
     expect(res.status()).toBe(401);
   });
 
   test('with the wrong bearer token is rejected', async ({ request }) => {
     const res = await request.post('/api/usage', {
       headers: { authorization: 'Bearer not-the-real-token' },
-      data: { today: 1, week: 1, year: 1, tokensToday: 1 },
+      data: { today: 1, week: 1, quarter: 1, tokensToday: 1 },
     });
     expect(res.status()).toBe(401);
   });
@@ -80,7 +80,7 @@ test.describe('POST /api/usage auth', () => {
     // rather than returning false) — this must come back 401, not 500.
     const res = await request.post('/api/usage', {
       headers: { authorization: 'Bearer short' },
-      data: { today: 1, week: 1, year: 1, tokensToday: 1 },
+      data: { today: 1, week: 1, quarter: 1, tokensToday: 1 },
     });
     expect(res.status()).toBe(401);
   });
@@ -92,13 +92,13 @@ test.describe('POST /api/usage with a valid token', () => {
   test('stores the snapshot and GET reflects it back', async ({ request }) => {
     const res = await request.post('/api/usage', {
       headers: { authorization: `Bearer ${TOKEN}` },
-      data: { today: 12.34, week: 56.78, year: 900.01, tokensToday: 123456 },
+      data: { today: 12.34, week: 56.78, quarter: 900.01, tokensToday: 123456 },
     });
     expect(res.status()).toBe(200);
     const posted = await res.json();
     expect(posted.today).toBe(12.34);
     expect(posted.week).toBe(56.78);
-    expect(posted.year).toBe(900.01);
+    expect(posted.quarter).toBe(900.01);
     expect(posted.tokensToday).toBe(123456);
     expect(typeof posted.updatedAt).toBe('number');
 
@@ -109,20 +109,20 @@ test.describe('POST /api/usage with a valid token', () => {
   test('coerces non-finite and negative fields to 0 instead of storing them', async ({ request }) => {
     const res = await request.post('/api/usage', {
       headers: { authorization: `Bearer ${TOKEN}` },
-      data: { today: -5, week: 'not-a-number', year: Number.POSITIVE_INFINITY, tokensToday: 42 },
+      data: { today: -5, week: 'not-a-number', quarter: Number.POSITIVE_INFINITY, tokensToday: 42 },
     });
     expect(res.status()).toBe(200);
     const body = await res.json();
     expect(body.today).toBe(0);
     expect(body.week).toBe(0);
-    expect(body.year).toBe(0);
+    expect(body.quarter).toBe(0);
     expect(body.tokensToday).toBe(42);
   });
 });
 
 test.describe('footer staleness on the homepage', () => {
   test('a fresh snapshot renders a real figure', async ({ page }) => {
-    putUsageSnapshot({ today: 7.5, week: 20, year: 300, tokensToday: 99000, updatedAt: Date.now(), date: localDateStr() });
+    putUsageSnapshot({ today: 7.5, week: 20, quarter: 300, tokensToday: 99000, updatedAt: Date.now(), date: localDateStr() });
     await page.goto('/');
     const amount = page.locator('[data-tok-amount]');
     await expect(amount).toHaveText('$7.50');
@@ -130,7 +130,7 @@ test.describe('footer staleness on the homepage', () => {
 
   test('a snapshot older than 48 hours renders — instead of the stale figure', async ({ page }) => {
     const staleUpdatedAt = Date.now() - 49 * 60 * 60 * 1000;
-    putUsageSnapshot({ today: 7.5, week: 20, year: 300, tokensToday: 99000, updatedAt: staleUpdatedAt, date: localDateStr() });
+    putUsageSnapshot({ today: 7.5, week: 20, quarter: 300, tokensToday: 99000, updatedAt: staleUpdatedAt, date: localDateStr() });
     await page.goto('/');
     const amount = page.locator('[data-tok-amount]');
     await expect(amount).toHaveText('—');
@@ -141,27 +141,27 @@ test.describe('day-rollover guard on the homepage footer', () => {
   // The 48h staleness guard alone can't catch this: a snapshot pushed
   // yesterday evening is still well within 48h this morning, but its
   // `today` figure describes a day that's already over for the viewer.
-  test('a fresh-but-yesterday snapshot dashes today, not week/year', async ({ page }) => {
+  test('a fresh-but-yesterday snapshot dashes today, not week/quarter', async ({ page }) => {
     putUsageSnapshot({
       today: 7.5,
       week: 20,
-      year: 300,
+      quarter: 300,
       tokensToday: 99000,
       updatedAt: Date.now(),
       date: '2000-01-01', // never equals "today" regardless of when this test runs
     });
     await page.goto('/');
     await expect(page.locator('[data-tok-amount]')).toHaveText('—');
-    // Open the hover card to check week/year, which should still be real.
+    // Open the hover card to check week/quarter, which should still be real.
     await page.locator('[data-tok-wrap]').hover();
     await expect(page.locator('[data-tok-card-today]')).toHaveText('—');
     await expect(page.locator('[data-tok-card-week]')).toHaveText('$20.00');
-    await expect(page.locator('[data-tok-card-year]')).toHaveText('$300.00');
+    await expect(page.locator('[data-tok-card-quarter]')).toHaveText('$300.00');
     await expect(page.locator('[data-tok-card-tokens]')).toHaveText('—');
   });
 
   test('a snapshot with no date field at all is treated as unknown, not crashing', async ({ page }) => {
-    putUsageSnapshot({ today: 7.5, week: 20, year: 300, tokensToday: 99000, updatedAt: Date.now() });
+    putUsageSnapshot({ today: 7.5, week: 20, quarter: 300, tokensToday: 99000, updatedAt: Date.now() });
     await page.goto('/');
     await expect(page.locator('[data-tok-amount]')).toHaveText('—');
   });
