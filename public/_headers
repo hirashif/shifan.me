@@ -26,3 +26,11 @@
 
 /hereismyresume.pdf
   X-Robots-Tag: noindex, nofollow, noarchive, noai, noimageai
+
+# /outbound/: a case study shifan links in emails. noindex like the resume pages;
+# the splat covers the page as served (/outbound/), the bare rule the redirect.
+/outbound
+  X-Robots-Tag: noindex, nofollow, noarchive, noai, noimageai
+
+/outbound/*
+  X-Robots-Tag: noindex, nofollow, noarchive, noai, noimageai

@@ -11,6 +11,7 @@ A small, fast, mostly-static personal site with a few live bits:
 - **/writing** — long-form posts. tag filter. markdown/MDX source.
 - **/learnings** — exactly 15 one-liners. no dates, no tags, no filters. when a new one is added, an old one is removed. mix of life and work.
 - **/plot** — the full pixel guestbook + recent claims list.
+- **/outbound/** — a case study ("How I ran outbound for my own job search") that shifan links in emails. **Not** a blog post: `noindex` meta + `X-Robots-Tag` (`/outbound/*` in `_headers`), excluded from the sitemap, not in the dock. The text is his, rendered verbatim from `src/content/outbound.md` — edit it there, never retype or rewrite it. It is **deliberately sentence case**, a standing exception to the lowercase rule, and deliberately anonymized: add no company or person names. The funnel table stacks into label/value rows under 640px. Body styles come from the shared `src/styles/prose.css`, the same file the writing posts use.
 
 Floating dock at the bottom on every page: home · writing · learnings · plot · resume · | · github · linkedin · email (copies to clipboard, "copied" bubble) · book a call (`https://cal.com/shifan/15min`, new tab) · theme (sun/moon). Eleven items; at 375px they shrink to 32px each and fit with zero spare, so anything else added to the dock has to displace something.
 
@@ -121,7 +122,7 @@ Keyboard: `t` toggles theme, `g` jumps to the plot. Ignore when focus is in an i
 ## Frontend tooling Claude Code should use
 
 - `pnpm`. Scripts: `dev`, `build`, `preview`, `deploy`, `typecheck`, `test`, `usage:push`, `resumes`.
-- **Playwright**, 135 tests. Load-bearing ones: surname absent from rendered *visible text* (hrefs and the email are allowed), learnings count = 15, theme persists, plot claim flow, `t`/`g` shortcuts, no console errors per route, no horizontal overflow at 375px, resume not indexed, sitemap excludes the resume, redirect stubs intact.
+- **Playwright**, 146 tests. Load-bearing ones: surname absent from rendered *visible text* (hrefs and the email are allowed), learnings count = 15, theme persists, plot claim flow, `t`/`g` shortcuts, no console errors per route, no horizontal overflow at 375px, resume not indexed, sitemap excludes the resume, redirect stubs intact.
 - **Lighthouse CI is NOT wired up.** perf ≥ 95 / a11y ≥ 95 remains the intent, but nothing enforces it — it was left out as too flaky on shared CI runners. Do not describe it as a gate. Dock buttons still need real `aria-label`s; the visual tooltip is not an accessible name.
 - CI runs on push/PR via `.github/workflows/ci.yml`: typecheck, build, Playwright. It must keep working on a clean clone with no `.dev.vars` and no Cloudflare credentials.
 - Astro's dev toolbar is disabled under test (`ASTRO_DEV_TOOLBAR=0`); it injected extra `<h1>`s and made the suite flaky.
