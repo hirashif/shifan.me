@@ -87,3 +87,11 @@ test('not in the sitemap', () => {
   test.skip(!path, 'sitemap only exists after pnpm build');
   expect(readFileSync(path!, 'utf-8')).not.toContain('/outbound');
 });
+
+// Regression guard: Tailwind's preflight strips list-style, which silently
+// dropped the bullets and the 1-2-3 numbering from this page's lists.
+test('lists keep their bullets and numbers', async ({ page }) => {
+  await page.goto(PAGE);
+  await expect(page.locator('article ol')).toHaveCSS('list-style-type', 'decimal');
+  await expect(page.locator('article ul')).toHaveCSS('list-style-type', 'disc');
+});

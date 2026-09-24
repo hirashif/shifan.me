@@ -34,5 +34,5 @@ The few rules most often broken by someone who hasn't read it:
    Cloudflare adapter regenerates config at build time and deploying stale silently
    drops it.
 
-Run `pnpm typecheck` and `pnpm test` (146 tests) before committing. Never weaken a
+Run `pnpm typecheck` and `pnpm test` (147 tests) before committing. Never weaken a
 test to make the suite green.
