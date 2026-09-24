@@ -6,6 +6,8 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PAGE = '/hereismyresume';
 const PDF = '/hereismyresume.pdf';
+const AI_PAGE = '/hereismyresume/ai/';
+const AI_PDF = '/hereismyresume-ai.pdf';
 const OLD_SECRET = '/2v16erb7nu5o5c';
 const GUESSABLE_PAGE = '/resume';
 const GUESSABLE_PDF = '/resume.pdf';
@@ -35,7 +37,7 @@ test('the pdf is served at the readable-with-entropy path', async ({ request }) 
 // header rules directly rather than asserting on a live response.
 test('public/_headers sets X-Robots-Tag noindex on both the page and the pdf', () => {
   const headers = readFileSync(join(__dirname, '..', 'public', '_headers'), 'utf-8');
-  for (const path of [PAGE, PDF]) {
+  for (const path of [PAGE, '/hereismyresume/*', PDF, AI_PDF]) {
     const lines = headers.split('\n');
     const start = lines.findIndex((l) => l.trim() === path);
     expect(start, `no section for ${path} in public/_headers`).toBeGreaterThanOrEqual(0);
@@ -108,4 +110,26 @@ test('the dock links to the resume on every route', async ({ page }) => {
     // Internal navigation — must not open in a new tab like github/linkedin do.
     await expect(dockLink).not.toHaveAttribute('target', '_blank');
   }
+});
+
+// /hereismyresume/ai/ is a second copy of the resume page (the ai/gtm version),
+// deliberately not linked from the dock. Same noindex treatment as the main page.
+test('the ai resume page renders, is noindex, and embeds the ai pdf', async ({ page }) => {
+  await page.goto(AI_PAGE);
+  await expect(page.getByRole('link', { name: /shifan\.me/ })).toBeVisible();
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
+  await expect(page.locator('object.pdf-embed')).toHaveAttribute('data', AI_PDF);
+});
+
+test('the ai pdf is served and differs from the main pdf', async ({ request }) => {
+  const ai = await request.get(AI_PDF);
+  const main = await request.get(PDF);
+  expect(ai.status()).toBe(200);
+  expect(ai.headers()['content-type']).toContain('pdf');
+  expect(Buffer.compare(await ai.body(), await main.body())).not.toBe(0);
+});
+
+test('the dock does not link to the ai resume', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator(`a[href^="/hereismyresume/ai"], a[href="${AI_PDF}"]`)).toHaveCount(0);
 });

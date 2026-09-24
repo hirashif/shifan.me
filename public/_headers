@@ -15,5 +15,14 @@
 /hereismyresume
   X-Robots-Tag: noindex, nofollow, noarchive, noai, noimageai
 
+# The bare path above only ever answers with a 307 to the trailing-slash URL,
+# so on its own it never covered the page people actually land on. This splat
+# covers /hereismyresume/ itself and the /hereismyresume/ai/ variant.
+/hereismyresume/*
+  X-Robots-Tag: noindex, nofollow, noarchive, noai, noimageai
+
+/hereismyresume-ai.pdf
+  X-Robots-Tag: noindex, nofollow, noarchive, noai, noimageai
+
 /hereismyresume.pdf
   X-Robots-Tag: noindex, nofollow, noarchive, noai, noimageai

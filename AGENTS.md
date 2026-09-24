@@ -23,7 +23,8 @@ The few rules most often broken by someone who hasn't read it:
    checks — that races.
 6. **The resume page must stay out of search.** `/hereismyresume` is linked from the
    dock but carries `noindex` plus an `X-Robots-Tag` header, and is excluded from the
-   sitemap. `/resume` must not exist or redirect. Never add the path to `robots.txt`
+   sitemap. `/hereismyresume/ai/` is a second, dock-unlinked variant with the same
+   protections. `/resume` must not exist or redirect. Never add the path to `robots.txt`
    — that publishes it.
 7. **Don't fabricate numbers.** The token footer, the contributions chart, and post
    dates all show real data or nothing. The footer dashes out rather than presenting
@@ -32,5 +33,5 @@ The few rules most often broken by someone who hasn't read it:
    Cloudflare adapter regenerates config at build time and deploying stale silently
    drops it.
 
-Run `pnpm typecheck` and `pnpm test` (132 tests) before committing. Never weaken a
+Run `pnpm typecheck` and `pnpm test` (135 tests) before committing. Never weaken a
 test to make the suite green.
