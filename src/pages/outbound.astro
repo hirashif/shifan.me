@@ -1,6 +1,7 @@
 ---
-// /outbound/: a case study shifan links in emails. Not a blog post: noindex,
-// not in the dock or sitemap (see CLAUDE.md). The text is his, rendered
+// /outbound/: a case study, indexed and in the sitemap like the writing posts,
+// and listed in the home page's writing section (see index.astro). Not in the
+// dock. Its url is already in emails, so it stays at /outbound/. The text is his, rendered
 // verbatim from src/content/outbound.md; edit it there, never retype it here.
 // It keeps its own sentence case, an approved exception to the lowercase rule.
 import Base from '../layouts/Base.astro';
@@ -10,9 +11,6 @@ import { Content, getHeadings } from '../content/outbound.md';
 const title = getHeadings()[0]?.text ?? '';
 ---
 <Base title={title} description="This is what I built, what broke, and the numbers so far." type="article">
-  <Fragment slot="head">
-    <meta name="robots" content="noindex, nofollow" />
-  </Fragment>
   <a href="/" class="mono back-link">← back to shifan.me</a>
   <article class="prose outbound fade-up">
     <Content />

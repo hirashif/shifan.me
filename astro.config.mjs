@@ -20,9 +20,7 @@ export default defineConfig({
       // the `redirects` block below) — it's not a real page and must be
       // excluded too, both because it's redirect-only and because it also
       // points at the resume.
-      // /outbound/ is an email-only case study, noindex for the same reason.
-      filter: (page) =>
-        !page.includes('/hereismyresume') && !page.includes('/2v16erb7nu5o5c') && !page.includes('/outbound'),
+      filter: (page) => !page.includes('/hereismyresume') && !page.includes('/2v16erb7nu5o5c'),
     }),
   ],
   vite: { plugins: [tailwindcss()] },

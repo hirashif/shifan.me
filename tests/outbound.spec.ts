@@ -7,8 +7,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const PAGE = '/outbound/';
 const SOURCE = join(__dirname, '..', 'src', 'content', 'outbound.md');
 
-// /outbound/ is a case study shifan links in emails: noindex, not in the dock,
-// not in the sitemap, text rendered verbatim from src/content/outbound.md.
+// /outbound/ is a case study: indexed and in the sitemap like the writing
+// posts, listed first in the home page's writing section, not in the dock,
+// text rendered verbatim from src/content/outbound.md.
 
 test('renders the case study title and date', async ({ page }) => {
   await page.goto(PAGE);
@@ -17,9 +18,9 @@ test('renders the case study title and date', async ({ page }) => {
   await expect(page).toHaveTitle('How I ran outbound for my own job search');
 });
 
-test('is noindex via meta tag', async ({ page }) => {
+test('is indexable: no robots noindex meta', async ({ page }) => {
   await page.goto(PAGE);
-  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
+  await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
 });
 
 test('the funnel renders as a real table with every row', async ({ page }) => {
@@ -66,26 +67,26 @@ test('no em dashes and no surname in the page text', async ({ page }) => {
   expect(text.toLowerCase()).not.toContain('hirani');
 });
 
-test('not linked from the dock or the home page', async ({ page }) => {
+test('is the newest entry in the home page writing list, not in the dock', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('a[href*="/outbound"]')).toHaveCount(0);
+  const first = page.locator('#writing a.writing-row').first();
+  await expect(first).toHaveAttribute('href', '/outbound/');
+  await expect(first).toContainText('running outbound on my own job search');
+  await expect(first.locator('.writing-date')).toHaveText('sep');
+  await expect(page.locator('#writing a.writing-row')).toHaveCount(7);
+  await expect(page.locator('nav[aria-label="site"] a[href*="/outbound"]')).toHaveCount(0);
 });
 
-test('public/_headers noindexes the page as served', () => {
+test('public/_headers carries no noindex rule for it', () => {
   const headers = readFileSync(join(__dirname, '..', 'public', '_headers'), 'utf-8');
-  for (const path of ['/outbound', '/outbound/*']) {
-    const lines = headers.split('\n');
-    const start = lines.findIndex((l) => l.trim() === path);
-    expect(start, `no section for ${path}`).toBeGreaterThanOrEqual(0);
-    expect(lines[start + 1]).toMatch(/X-Robots-Tag:.*noindex/i);
-  }
+  expect(headers).not.toMatch(/^\/outbound/m);
 });
 
-test('not in the sitemap', () => {
+test('is in the sitemap', () => {
   const candidates = [join(__dirname, '..', 'dist', 'client', 'sitemap-0.xml'), join(__dirname, '..', 'dist', 'sitemap-0.xml')];
   const path = candidates.find((p) => existsSync(p));
   test.skip(!path, 'sitemap only exists after pnpm build');
-  expect(readFileSync(path!, 'utf-8')).not.toContain('/outbound');
+  expect(readFileSync(path!, 'utf-8')).toContain('<loc>https://shifan.me/outbound/</loc>');
 });
 
 // Regression guard: Tailwind's preflight strips list-style, which silently

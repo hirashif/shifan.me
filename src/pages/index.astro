@@ -15,8 +15,21 @@ import { fmtMonth } from '../lib/date';
 
 const learnedPreview = learnings.slice(0, 3);
 
-const posts = (await getCollection('writing'))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+// /outbound/ is a standalone page, not a writing-collection post: its url is
+// already out in emails, so it can't move under /writing/. It joins the list here.
+const standalone = [
+  { title: 'running outbound on my own job search', href: '/outbound/', date: new Date('2026-09-24') },
+];
+
+const posts = [
+  ...(await getCollection('writing')).map((post) => ({
+    title: post.data.title,
+    href: `/writing/${post.id}`,
+    date: post.data.date,
+  })),
+  ...standalone,
+]
+  .sort((a, b) => b.date.valueOf() - a.date.valueOf())
   .slice(0, 7);
 ---
 <Base title="shifan" pad="home">
@@ -53,9 +66,9 @@ const posts = (await getCollection('writing'))
       <a href="/writing" class="all-link">all →</a>
     </div>
     {posts.map((post) => (
-      <a href={`/writing/${post.id}`} class="writing-row">
-        <span>{post.data.title}</span>
-        <span class="writing-date mono">{fmtMonth(post.data.date)}</span>
+      <a href={post.href} class="writing-row">
+        <span>{post.title}</span>
+        <span class="writing-date mono">{fmtMonth(post.date)}</span>
       </a>
     ))}
   </section>
