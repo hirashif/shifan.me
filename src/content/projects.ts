@@ -6,6 +6,11 @@ export interface Project {
 
 export const projects: Project[] = [
   {
+    name: 'bakeoff',
+    href: 'https://github.com/bakeoff-dev/bakeoff',
+    desc: 'race coding agents on your real issues. merge the winner.',
+  },
+  {
     name: 'ledger',
     href: 'https://github.com/hirashif/ledger',
     desc: 'double-entry ledger in java. idempotency keys, row-level locking, balance enforced by postgres.',
