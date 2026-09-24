@@ -14,6 +14,7 @@
     "typecheck": "wrangler types && astro check && tsc --noEmit",
     "test": "playwright test",
     "usage:push": "bash scripts/usage-cron.sh",
+    "resumes": "bash scripts/update-resumes.sh",
     "astro": "astro"
   },
   "dependencies": {

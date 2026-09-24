@@ -60,6 +60,14 @@ Floating dock at the bottom on every page: home · writing · learnings · plot 
   shifan hands it out directly. Keep the two pages identical apart from the PDF path.
   The `_headers` rule `/hereismyresume/*` is what covers both pages' real (trailing-
   slash) URLs; the bare `/hereismyresume` rule only ever matches the 307 redirect.
+
+  **Updating the resumes: `pnpm resumes`** (`scripts/update-resumes.sh`). It copies
+  `Shifan_Hirani_Resume_web.pdf` and `..._GTM_web.pdf` from `~/Documents/job apps/resumes/`,
+  commits and deploys shifan.me if either changed, updates `hirashif.github.io/resume.pdf`
+  to match the main one (that old URL is still publicly indexed, so it must not go stale),
+  then checks all three live URLs by md5. It refuses to run off `main` or with other
+  uncommitted changes, because `pnpm build` would deploy those too. Use it rather than
+  copying PDFs by hand, which is how the github.io copy drifted before.
 - **lowercase everywhere.** copy, headings, nav, tooltips. brand names too (paycom, postgres). the only capitals are in code/badges like `LIVE`. Approved exception: roman
   numerals in job titles, e.g. `software developer II` (see `src/content/work.ts`) — same
   spirit as the `LIVE`/`OSS` badge exception, not a loophole to generalize from.
@@ -112,7 +120,7 @@ Keyboard: `t` toggles theme, `g` jumps to the plot. Ignore when focus is in an i
 
 ## Frontend tooling Claude Code should use
 
-- `pnpm`. Scripts: `dev`, `build`, `preview`, `lint` (eslint + prettier), `typecheck`, `test`.
+- `pnpm`. Scripts: `dev`, `build`, `preview`, `deploy`, `typecheck`, `test`, `usage:push`, `resumes`.
 - **Playwright**, 135 tests. Load-bearing ones: surname absent from rendered *visible text* (hrefs and the email are allowed), learnings count = 15, theme persists, plot claim flow, `t`/`g` shortcuts, no console errors per route, no horizontal overflow at 375px, resume not indexed, sitemap excludes the resume, redirect stubs intact.
 - **Lighthouse CI is NOT wired up.** perf ≥ 95 / a11y ≥ 95 remains the intent, but nothing enforces it — it was left out as too flaky on shared CI runners. Do not describe it as a gate. Dock buttons still need real `aria-label`s; the visual tooltip is not an accessible name.
 - CI runs on push/PR via `.github/workflows/ci.yml`: typecheck, build, Playwright. It must keep working on a clean clone with no `.dev.vars` and no Cloudflare credentials.
