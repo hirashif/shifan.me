@@ -8,8 +8,8 @@ const PAGE = '/outbound/';
 const SOURCE = join(__dirname, '..', 'src', 'content', 'outbound.md');
 
 // /outbound/ is a case study: indexed and in the sitemap like the writing
-// posts, listed first in the home page's writing section, not in the dock,
-// text rendered verbatim from src/content/outbound.md.
+// posts, but not linked from the home page or the dock. Text rendered verbatim
+// from src/content/outbound.md.
 
 test('renders the case study title and date', async ({ page }) => {
   await page.goto(PAGE);
@@ -67,14 +67,10 @@ test('no em dashes and no surname in the page text', async ({ page }) => {
   expect(text.toLowerCase()).not.toContain('hirani');
 });
 
-test('is the newest entry in the home page writing list, not in the dock', async ({ page }) => {
+test('is not linked from the home page or the dock', async ({ page }) => {
   await page.goto('/');
-  const first = page.locator('#writing a.writing-row').first();
-  await expect(first).toHaveAttribute('href', '/outbound/');
-  await expect(first).toContainText('running outbound on my own job search');
-  await expect(first.locator('.writing-date')).toHaveText('sep');
+  await expect(page.locator('a[href*="/outbound"]')).toHaveCount(0);
   await expect(page.locator('#writing a.writing-row')).toHaveCount(7);
-  await expect(page.locator('nav[aria-label="site"] a[href*="/outbound"]')).toHaveCount(0);
 });
 
 test('public/_headers carries no noindex rule for it', () => {
