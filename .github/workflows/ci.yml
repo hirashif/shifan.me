@@ -40,6 +40,10 @@ jobs:
             echo "USAGE_TOKEN=$(openssl rand -hex 32)"
           } > .dev.vars
 
+      # Local D1 starts empty in CI; create the plot table the same way prod was.
+      - name: apply D1 migrations locally
+        run: pnpm exec wrangler d1 migrations apply shifan-plot --local
+
       - name: build
         run: pnpm build
 
