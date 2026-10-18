@@ -28,6 +28,18 @@ jobs:
       - name: install playwright browsers
         run: pnpm exec playwright install --with-deps chromium
 
+      # The tests read secrets from .dev.vars (gitignored, local only) and the
+      # dev server loads it as its env. CI gets throwaway random values so the
+      # suite runs the same way it does locally, with no real secrets involved.
+      - name: write throwaway .dev.vars
+        run: |
+          {
+            echo "GITHUB_CLIENT_ID=ci-test-client"
+            echo "GITHUB_CLIENT_SECRET=$(openssl rand -hex 16)"
+            echo "SESSION_SECRET=$(openssl rand -hex 32)"
+            echo "USAGE_TOKEN=$(openssl rand -hex 32)"
+          } > .dev.vars
+
       - name: build
         run: pnpm build
 
