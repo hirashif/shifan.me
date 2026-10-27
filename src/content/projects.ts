@@ -6,6 +6,16 @@ export interface Project {
 
 export const projects: Project[] = [
   {
+    name: 'usage-billing',
+    href: 'https://github.com/hirashif/usage-billing',
+    desc: 'prepaid usage billing. metered once, tiered pricing, auto-recharge, reconciliation that catches drift.',
+  },
+  {
+    name: 'signal-router',
+    href: 'https://github.com/hirashif/signal-router',
+    desc: 'lead router into hubspot. enrichment, icp scoring, owner routing, nightly drift check.',
+  },
+  {
     name: 'bakeoff',
     href: 'https://github.com/bakeoff-dev/bakeoff',
     desc: 'race coding agents on your real issues. merge the winner.',
