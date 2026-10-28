@@ -3,10 +3,10 @@ title: 'ordering without global order'
 date: 2026-09-03
 tag: 'kafka'
 minutes: 2
-excerpt: 'crypto-market-pipeline is three go services: an ingester pulling exchange prices, a processor, and a rest api, connected by kafka with redis as the hot store.'
+excerpt: 'tickstream is three go services: an ingester pulling exchange prices, a processor, and a rest api, connected by kafka with redis as the hot store.'
 ---
 
-crypto-market-pipeline is three go services: an ingester pulling exchange prices, a processor, and a rest api, connected by kafka with redis as the hot store. i built it in two days to close the cloud gap on my resume, then spent longer getting it to behave on a real azure aks cluster than i spent writing it.
+tickstream is three go services: an ingester pulling exchange prices, a processor, and a rest api, connected by kafka with redis as the hot store. i built it in two days to close the cloud gap on my resume, then spent longer getting it to behave on a real azure aks cluster than i spent writing it.
 
 the decision that shaped everything else is the partitioning. prices are partitioned by symbol, so btc-usd lands on one partition and eth-usd on another. kafka guarantees order within a partition, which means every consumer sees each symbol's ticks in sequence. that is the only ordering a price feed needs, so it is the only ordering i kept. global order across symbols is gone, and i gave it up on purpose, because nothing downstream ever compares a btc tick to an eth tick by arrival time.
 
@@ -19,4 +19,4 @@ what broke, in the order it broke:
 - rolling restarts dropped in-flight messages. the processor died on sigterm without draining, so deploys quietly ate data. it now stops consuming on the signal, finishes its batch, commits, and exits.
 - during an exchange outage my reconnect loop hammered their api at full speed. backoff with jitter went in the same night.
 
-[the repo](https://github.com/hirashif/crypto-market-pipeline) has the terraform, the github actions pipeline, and a readme that covers most of this.
+[the repo](https://github.com/hirashif/tickstream) has the terraform, the github actions pipeline, and a readme that covers most of this.

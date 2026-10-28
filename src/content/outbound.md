@@ -54,7 +54,7 @@ I use Claude Code for the research: pulling postings, filtering by requirements,
 
 Right now the loop runs through scripts and me. The next step is putting it on real GTM tooling: enrichment and scoring in Clay or n8n, a proper sequence with reply tracking instead of a markdown log, and a weekly readout of reply rate by segment. That's close to the job I'm applying for, which is part of why I want it.
 
-Since September I've built two pieces of this myself. signal-router enriches new leads, scores them and routes them into HubSpot. usage-billing models the other end of the funnel: metering, tiered pricing, and a daily check that billing matches payments.
+Since September I've built two pieces of this myself. signal-router enriches new leads, scores them and routes them into HubSpot. meterline models the other end of the funnel: metering, tiered pricing, and a daily check that billing matches payments.
 
 ---
 

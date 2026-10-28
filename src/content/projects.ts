@@ -6,8 +6,8 @@ export interface Project {
 
 export const projects: Project[] = [
   {
-    name: 'usage-billing',
-    href: 'https://github.com/hirashif/usage-billing',
+    name: 'meterline',
+    href: 'https://github.com/hirashif/meterline',
     desc: 'prepaid usage billing. metered once, tiered pricing, auto-recharge, reconciliation that catches drift.',
   },
   {
@@ -21,13 +21,13 @@ export const projects: Project[] = [
     desc: 'race coding agents on your real issues. merge the winner.',
   },
   {
-    name: 'ledger',
-    href: 'https://github.com/hirashif/ledger',
+    name: 'tally',
+    href: 'https://github.com/hirashif/tally',
     desc: 'double-entry ledger in java. idempotency keys, row-level locking, balance enforced by postgres.',
   },
   {
-    name: 'crypto-market-pipeline',
-    href: 'https://github.com/hirashif/crypto-market-pipeline',
+    name: 'tickstream',
+    href: 'https://github.com/hirashif/tickstream',
     desc: 'go services streaming exchange data into kafka, on aks with terraform.',
   },
   {
